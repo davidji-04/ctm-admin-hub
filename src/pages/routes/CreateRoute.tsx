@@ -1,6 +1,7 @@
 import { WizardProvider, useWizard } from "@/contexts/WizardContext";
 import { WizardProgress } from "@/components/routes/wizard/WizardProgress";
 import { Step1BasicInfo } from "@/components/routes/wizard/Step1BasicInfo";
+import { Step2TechnicalInfo } from "@/components/routes/wizard/Step2TechnicalInfo";
 
 const CreateRouteContent = () => {
   const { currentStep } = useWizard();
@@ -18,7 +19,7 @@ const CreateRouteContent = () => {
 
       <div className="bg-card rounded-lg shadow-sm border p-8">
         {currentStep === 1 && <Step1BasicInfo />}
-        {currentStep === 2 && <div className="text-center text-muted-foreground">Step 2 - Coming Soon</div>}
+        {currentStep === 2 && <Step2TechnicalInfo />}
         {currentStep === 3 && <div className="text-center text-muted-foreground">Step 3 - Coming Soon</div>}
         {currentStep === 4 && <div className="text-center text-muted-foreground">Step 4 - Coming Soon</div>}
       </div>

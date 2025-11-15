@@ -10,7 +10,12 @@ interface WizardData {
     dificuldade_geral: 'facil' | 'media' | 'dificil';
     status: 'rascunho' | 'ativo' | 'inativo';
   };
-  step2?: any;
+  step2?: {
+    distancia_total?: number;
+    elevacao_altimetria?: number;
+    tipo_terreno: string;
+    altura_max_veiculo?: number;
+  };
   step3?: any;
   step4?: any;
 }
