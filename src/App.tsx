@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import RoutesPage from "./pages/Routes";
 import ComingSoon from "./pages/ComingSoon";
+import { CreateRoute } from "./pages/routes/CreateRoute";
 import NotFound from "./pages/NotFound";
 import MainLayout from "./components/layout/MainLayout";
 
@@ -24,6 +25,7 @@ const App = () => (
           <Route element={<MainLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/routes" element={<RoutesPage />} />
+            <Route path="/routes/create" element={<CreateRoute />} />
             <Route path="/localities" element={<ComingSoon title="Localities" description="Manage all route localities and waypoints" />} />
             <Route path="/services" element={<ComingSoon title="Services" description="Manage restaurants, hotels, and other services" />} />
             <Route path="/itineraries" element={<ComingSoon title="Premium Itineraries" description="Create and manage multi-day itineraries" />} />
