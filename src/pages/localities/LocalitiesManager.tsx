@@ -397,6 +397,25 @@ export const LocalitiesManager = () => {
   const totalDistance = localities.reduce((sum, loc) => sum + loc.distancia_localidade_anterior, 0);
   const totalTime = localities.reduce((sum, loc) => sum + loc.tempo_estimado_da_anterior, 0);
 
+  // RN-001: Automatically update route's distancia_total when localities change
+  useEffect(() => {
+    const updateRouteDistance = async () => {
+      if (!routeId) return;
+      
+      // In production, this would call backend API to update route.distancia_total
+      // For now, we just log the update (mock API call)
+      console.log(`[RN-001] Auto-updating route ${routeId} distancia_total to ${totalDistance.toFixed(2)} km`);
+      
+      // Mock API call
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    };
+
+    // Only update if we have localities
+    if (localities.length > 0) {
+      updateRouteDistance();
+    }
+  }, [totalDistance, routeId, localities.length]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
