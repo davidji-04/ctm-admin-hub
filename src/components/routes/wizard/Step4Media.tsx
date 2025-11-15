@@ -65,7 +65,6 @@ export const Step4Media = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const userRole = getUserRole();
 
   const form = useForm<FormValues>({
@@ -90,19 +89,24 @@ export const Step4Media = () => {
       // Mock API call - in production this would save to real backend
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
+      // Generate mock routeId if not exists (in production this comes from backend)
+      const routeId = wizardData.routeId || `route-${Date.now()}`;
+      if (!wizardData.routeId) {
+        updateWizardData("routeId", routeId);
+      }
+
       const isPublishing = canPublish();
 
       toast({
         title: isPublishing ? "Route Published!" : "Route Created!",
         description: isPublishing
-          ? "Your route is now live and visible to users"
-          : userRole === "editor"
-          ? "Draft saved successfully. An admin can review and publish."
-          : "Route created successfully",
+          ? "Your route is now live and visible to users. Add localities to complete setup."
+          : "Route created successfully. Add localities to complete setup.",
       });
 
-      // Show confirmation dialog
-      setShowConfirmDialog(true);
+      // Redirect to localities management for the newly created route
+      resetWizard();
+      navigate(`/routes/${routeId}/localities`);
     } catch (error) {
       toast({
         title: "Error",
@@ -114,10 +118,6 @@ export const Step4Media = () => {
     }
   };
 
-  const handleFinish = () => {
-    resetWizard();
-    navigate("/routes");
-  };
 
   const handleBack = () => {
     // Save current data before going back
@@ -252,27 +252,6 @@ export const Step4Media = () => {
           </form>
         </Form>
       </div>
-
-      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-primary" />
-              Route Created Successfully!
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {canPublish()
-                ? "Your route has been published and is now live. Users can view and interact with it."
-                : userRole === "editor"
-                ? "Your draft has been saved. An administrator will review and publish the route."
-                : "Your route has been created successfully. You can manage it from the routes list."}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={handleFinish}>Go to Routes List</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 };
