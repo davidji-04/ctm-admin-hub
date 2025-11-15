@@ -12,6 +12,8 @@ import { RouteDetails } from "./pages/routes/RouteDetails";
 import { LocalitiesManager } from "./pages/localities/LocalitiesManager";
 import LocalitiesList from "./pages/localities/LocalitiesList";
 import ServicesList from "./pages/services/ServicesList";
+import EquipmentList from "./pages/equipment/EquipmentList";
+import ImageGallery from "./pages/images/ImageGallery";
 import UsersManager from "./pages/users/UsersManager";
 import UserProfile from "./pages/users/UserProfile";
 import NotFound from "./pages/NotFound";
@@ -38,13 +40,13 @@ const App = () => (
             <Route path="/localities" element={<LocalitiesList />} />
             <Route path="/services" element={<ServicesList />} />
             <Route path="/itineraries" element={<ComingSoon title="Premium Itineraries" description="Create and manage multi-day itineraries" />} />
-            <Route path="/equipment" element={<ComingSoon title="Equipment" description="Manage recommended equipment for routes" />} />
+            <Route path="/equipment" element={<EquipmentList />} />
             <Route path="/training" element={<ComingSoon title="Training Programs" description="Create training plans and exercise sessions" />} />
             <Route path="/weather" element={<ComingSoon title="Weather Alerts" description="Configure weather alert rules and monitoring" />} />
             <Route path="/users" element={<UsersManager />} />
             <Route path="/users/:userId" element={<UserProfile />} />
             <Route path="/reviews" element={<ComingSoon title="Reviews" description="Moderate and respond to user reviews" />} />
-            <Route path="/images" element={<ComingSoon title="Image Management" description="Organize and manage all media assets" />} />
+            <Route path="/images" element={<ImageGallery />} />
             <Route path="/reports" element={<ComingSoon title="Reports & Analytics" description="Generate reports and view analytics" />} />
           </Route>
           <Route path="*" element={<NotFound />} />
