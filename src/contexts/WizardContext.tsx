@@ -25,7 +25,20 @@ interface WizardData {
     certificacoes?: string;
     relatos_equipe?: string;
   };
-  step4?: any;
+  step4?: {
+    heroImage: { id: string; url: string } | null;
+    gallery: Array<{ id: string; url: string }>;
+    gpxFile?: {
+      id: string;
+      url: string;
+      name: string;
+      metadata?: {
+        waypoints: number;
+        distance?: number;
+        elevation?: number;
+      };
+    } | null;
+  };
 }
 
 interface WizardContextType {
