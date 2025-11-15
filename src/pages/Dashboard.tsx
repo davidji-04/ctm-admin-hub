@@ -1,6 +1,18 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Route, Users, Star, TrendingUp, MapPin, AlertCircle } from "lucide-react";
+import { Route, Users, Star, TrendingUp, MapPin, AlertCircle, Crown, UserCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 
 const Dashboard = () => {
   const stats = [
@@ -12,26 +24,62 @@ const Dashboard = () => {
       color: "text-primary",
     },
     {
-      title: "Active Users",
-      value: "1,234",
-      change: "+12% vs last month",
-      icon: Users,
+      title: "Total Users",
+      value: "2,847",
+      change: "+156 this month",
+      icon: UserCheck,
       color: "text-info",
+    },
+    {
+      title: "Premium Users",
+      value: "384",
+      change: "+42 this month",
+      icon: Crown,
+      color: "text-warning",
     },
     {
       title: "Average Rating",
       value: "4.8",
       change: "+0.2 improvement",
       icon: Star,
-      color: "text-warning",
+      color: "text-success",
     },
     {
       title: "Premium Itineraries",
       value: "23",
       change: "+5 this month",
       icon: TrendingUp,
-      color: "text-success",
+      color: "text-accent",
     },
+  ];
+
+  // Mock data for Active Users line chart
+  const activeUsersData = [
+    { month: "Jan", users: 1420 },
+    { month: "Feb", users: 1680 },
+    { month: "Mar", users: 1950 },
+    { month: "Apr", users: 2100 },
+    { month: "May", users: 2340 },
+    { month: "Jun", users: 2520 },
+    { month: "Jul", users: 2680 },
+    { month: "Aug", users: 2847 },
+  ];
+
+  // Mock data for Most Accessed Routes bar chart
+  const mostAccessedRoutes = [
+    { name: "Caminho Português", accesses: 4567 },
+    { name: "Rota Vicentina", accesses: 3892 },
+    { name: "Via Algarviana", accesses: 3245 },
+    { name: "Serra da Estrela", accesses: 2876 },
+    { name: "Gerês Trail", accesses: 2543 },
+  ];
+
+  // Mock data for Conversion Rate funnel
+  const conversionData = [
+    { stage: "Free Sign-ups", value: 2463, percentage: 100 },
+    { stage: "Active Users", value: 1847, percentage: 75 },
+    { stage: "Trial Started", value: 923, percentage: 37 },
+    { stage: "Premium Converted", value: 384, percentage: 16 },
   ];
 
   const pendingActions = [
@@ -53,7 +101,7 @@ const Dashboard = () => {
         <p className="text-muted-foreground">Welcome back! Here's what's happening with CTM.</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         {stats.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -69,6 +117,126 @@ const Dashboard = () => {
           </Card>
         ))}
       </div>
+
+      {/* Data Visualizations - Charts */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Active Users Line Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Active Users</CardTitle>
+            <CardDescription>Monthly active user trend</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={activeUsersData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis 
+                  dataKey="month" 
+                  className="text-xs"
+                  tick={{ fill: "hsl(var(--muted-foreground))" }}
+                />
+                <YAxis 
+                  className="text-xs"
+                  tick={{ fill: "hsl(var(--muted-foreground))" }}
+                />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "var(--radius)",
+                  }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="users" 
+                  stroke="hsl(var(--chart-1))" 
+                  strokeWidth={2}
+                  dot={{ fill: "hsl(var(--chart-1))", r: 4 }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Most Accessed Routes Bar Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Most Accessed Routes</CardTitle>
+            <CardDescription>Top 5 routes by access count</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={mostAccessedRoutes} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis 
+                  type="number"
+                  className="text-xs"
+                  tick={{ fill: "hsl(var(--muted-foreground))" }}
+                />
+                <YAxis 
+                  type="category" 
+                  dataKey="name" 
+                  width={120}
+                  className="text-xs"
+                  tick={{ fill: "hsl(var(--muted-foreground))" }}
+                />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "var(--radius)",
+                  }}
+                />
+                <Bar dataKey="accesses" fill="hsl(var(--chart-2))" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Conversion Rate Funnel */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Conversion Rate (FREE → PREMIUM)</CardTitle>
+          <CardDescription>User conversion funnel from sign-up to premium</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {conversionData.map((stage, index) => (
+              <div key={stage.stage} className="space-y-2">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="font-medium">{stage.stage}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">{stage.value.toLocaleString()} users</span>
+                    <Badge variant="secondary">{stage.percentage}%</Badge>
+                  </div>
+                </div>
+                <div className="relative h-12 bg-muted rounded-lg overflow-hidden">
+                  <div
+                    className="absolute inset-y-0 left-0 flex items-center justify-center font-semibold text-sm transition-all"
+                    style={{
+                      width: `${stage.percentage}%`,
+                      backgroundColor: `hsl(var(--chart-${(index % 4) + 1}))`,
+                      color: "hsl(var(--primary-foreground))",
+                    }}
+                  >
+                    {stage.percentage >= 20 && `${stage.percentage}%`}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div className="pt-4 border-t">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">Overall Conversion Rate</span>
+                <Badge variant="default" className="text-base">
+                  {((conversionData[3].value / conversionData[0].value) * 100).toFixed(1)}%
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
