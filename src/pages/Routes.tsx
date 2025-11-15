@@ -44,6 +44,8 @@ const Routes = () => {
   const [duplicateTarget, setDuplicateTarget] = useState<{ id: string; title: string } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string; itineraries: number } | null>(null);
 
+  // Mock routes - only routes that have localities defined
+  // Routes without localities are in the Localities module work queue
   const mockRoutes = [
     {
       id: 1,
