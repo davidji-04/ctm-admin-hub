@@ -19,10 +19,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Plus, Search, MoreVertical, Edit, Copy, Trash2, Eye, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { DuplicateRouteModal } from "@/components/routes/DuplicateRouteModal";
+import { DeleteRouteModal } from "@/components/routes/DeleteRouteModal";
+
+// Mock user role
+const getUserRole = (): "admin" | "editor" => "admin";
 
 const Routes = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const userRole = getUserRole();
+  const [duplicateTarget, setDuplicateTarget] = useState<{ id: string; title: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string; itineraries: number } | null>(null);
 
   const mockRoutes = [
     {
@@ -75,6 +83,11 @@ const Routes = () => {
 
   const getCategoryColor = (category: string) => {
     return category === "premium" ? "default" : "secondary";
+  };
+
+  const handleRefresh = () => {
+    // Reload routes list
+    console.log('Refreshing routes list...');
   };
 
   return (
@@ -146,11 +159,11 @@ const Routes = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate(`/routes/${route.id}`)}>
                           <Eye className="w-4 h-4 mr-2" />
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate(`/routes/${route.id}/edit`)}>
                           <Edit className="w-4 h-4 mr-2" />
                           Edit Route
                         </DropdownMenuItem>
@@ -158,14 +171,29 @@ const Routes = () => {
                           <MapPin className="w-4 h-4 mr-2" />
                           Manage Localities
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Copy className="w-4 h-4 mr-2" />
-                          Duplicate
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
+                        {userRole === 'admin' && (
+                          <>
+                            <DropdownMenuItem
+                              onClick={() => setDuplicateTarget({ id: route.id.toString(), title: route.title })}
+                            >
+                              <Copy className="w-4 h-4 mr-2" />
+                              Duplicate
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() =>
+                                setDeleteTarget({
+                                  id: route.id.toString(),
+                                  title: route.title,
+                                  itineraries: 0,
+                                })
+                              }
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -175,6 +203,29 @@ const Routes = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Duplicate Modal */}
+      {duplicateTarget && (
+        <DuplicateRouteModal
+          open={!!duplicateTarget}
+          onOpenChange={(open) => !open && setDuplicateTarget(null)}
+          routeId={duplicateTarget.id}
+          routeTitle={duplicateTarget.title}
+          onSuccess={handleRefresh}
+        />
+      )}
+
+      {/* Delete Modal */}
+      {deleteTarget && (
+        <DeleteRouteModal
+          open={!!deleteTarget}
+          onOpenChange={(open) => !open && setDeleteTarget(null)}
+          routeId={deleteTarget.id}
+          routeTitle={deleteTarget.title}
+          activeItineraries={deleteTarget.itineraries}
+          onSuccess={handleRefresh}
+        />
+      )}
     </div>
   );
 };

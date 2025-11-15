@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import RoutesPage from "./pages/Routes";
 import ComingSoon from "./pages/ComingSoon";
 import { CreateRoute } from "./pages/routes/CreateRoute";
+import { RouteDetails } from "./pages/routes/RouteDetails";
 import { LocalitiesManager } from "./pages/localities/LocalitiesManager";
 import NotFound from "./pages/NotFound";
 import MainLayout from "./components/layout/MainLayout";
@@ -27,6 +28,8 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/routes" element={<RoutesPage />} />
             <Route path="/routes/create" element={<CreateRoute />} />
+            <Route path="/routes/:routeId" element={<RouteDetails />} />
+            <Route path="/routes/:routeId/edit" element={<CreateRoute />} />
             <Route path="/routes/:routeId/localities" element={<LocalitiesManager />} />
             <Route path="/localities" element={<ComingSoon title="Localities" description="Manage all route localities and waypoints" />} />
             <Route path="/services" element={<ComingSoon title="Services" description="Manage restaurants, hotels, and other services" />} />
