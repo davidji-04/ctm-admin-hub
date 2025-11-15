@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, Search, MoreVertical, Edit, Copy, Trash2, Eye } from "lucide-react";
+import { Plus, Search, MoreVertical, Edit, Copy, Trash2, Eye, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Routes = () => {
@@ -153,6 +153,10 @@ const Routes = () => {
                         <DropdownMenuItem>
                           <Edit className="w-4 h-4 mr-2" />
                           Edit Route
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate(`/routes/${route.id}/localities`)}>
+                          <MapPin className="w-4 h-4 mr-2" />
+                          Manage Localities
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Copy className="w-4 h-4 mr-2" />
