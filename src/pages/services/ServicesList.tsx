@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +16,9 @@ import { AddEditServiceModal } from '@/components/services/AddEditServiceModal';
 import { DeleteServiceModal } from '@/components/services/DeleteServiceModal';
 
 const ServicesList = () => {
+  const [searchParams] = useSearchParams();
+  const localityFilter = searchParams.get('locality');
+  
   const [services, setServices] = useState<Service[]>([
     {
       id: '1',
@@ -74,7 +78,8 @@ const ServicesList = () => {
     const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       service.address.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || service.category === categoryFilter;
-    return matchesSearch && matchesCategory;
+    const matchesLocality = !localityFilter || service.linkedLocalityIds.includes(localityFilter);
+    return matchesSearch && matchesCategory && matchesLocality;
   });
 
   return (
@@ -83,7 +88,9 @@ const ServicesList = () => {
         <div>
           <h1 className="text-3xl font-bold">Gestão de Serviços</h1>
           <p className="text-muted-foreground mt-1">
-            Gerir estabelecimentos e pontos de interesse
+            {localityFilter 
+              ? 'Serviços vinculados a esta localidade'
+              : 'Gerir estabelecimentos e pontos de interesse'}
           </p>
         </div>
         <Button onClick={() => setIsAddModalOpen(true)}>
