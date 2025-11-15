@@ -11,6 +11,7 @@ import { CreateRoute } from "./pages/routes/CreateRoute";
 import { RouteDetails } from "./pages/routes/RouteDetails";
 import { LocalitiesManager } from "./pages/localities/LocalitiesManager";
 import LocalitiesList from "./pages/localities/LocalitiesList";
+import ServicesList from "./pages/services/ServicesList";
 import UsersManager from "./pages/users/UsersManager";
 import UserProfile from "./pages/users/UserProfile";
 import NotFound from "./pages/NotFound";
@@ -35,7 +36,7 @@ const App = () => (
             <Route path="/routes/:routeId/edit" element={<CreateRoute />} />
             <Route path="/routes/:routeId/localities" element={<LocalitiesManager />} />
             <Route path="/localities" element={<LocalitiesList />} />
-            <Route path="/services" element={<ComingSoon title="Services" description="Manage restaurants, hotels, and other services" />} />
+            <Route path="/services" element={<ServicesList />} />
             <Route path="/itineraries" element={<ComingSoon title="Premium Itineraries" description="Create and manage multi-day itineraries" />} />
             <Route path="/equipment" element={<ComingSoon title="Equipment" description="Manage recommended equipment for routes" />} />
             <Route path="/training" element={<ComingSoon title="Training Programs" description="Create training plans and exercise sessions" />} />
