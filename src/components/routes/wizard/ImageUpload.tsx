@@ -86,21 +86,13 @@ export const ImageUpload = ({
       setIsUploading(true);
 
       try {
-        // Simulate upload
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const response = await fetch("/api/v1/uploads/image", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await response.json();
+        // Mock upload - in production this would upload to real backend
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         // For demo purposes, create object URL
         const objectUrl = URL.createObjectURL(file);
         onChange({
-          id: data.fileId || `img-${Date.now()}`,
+          id: `img-${Date.now()}`,
           url: objectUrl,
         });
 

@@ -102,17 +102,8 @@ export const Step2TechnicalInfo = () => {
   const onSubmit = async (data: FormValues) => {
     setIsSaving(true);
     try {
-      // Simulate API call
-      const response = await fetch(`/api/v1/routes/${wizardData.routeId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          step: 2,
-        }),
-      });
-
-      await response.json();
+      // Mock API call - in production this would save to real backend
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       // Store step data
       updateWizardData("step2", data);

@@ -87,20 +87,8 @@ export const Step4Media = () => {
       // Store step data
       updateWizardData("step4", data);
 
-      // Simulate final API call
-      const response = await fetch(`/api/v1/routes/${wizardData.routeId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          imagem_hero_id: data.heroImage?.id,
-          gallery_ids: data.gallery.map((img) => img.id),
-          arquivo_gpx_url: data.gpxFile?.url,
-          status: canPublish() ? "ativo" : wizardData.step1?.status,
-          completed: true,
-        }),
-      });
-
-      await response.json();
+      // Mock API call - in production this would save to real backend
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const isPublishing = canPublish();
 

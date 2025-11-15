@@ -130,18 +130,11 @@ export const GalleryUpload = ({ value, onChange }: GalleryUploadProps) => {
 
       try {
         const uploadPromises = validFiles.map(async (file) => {
-          const formData = new FormData();
-          formData.append("file", file);
-
-          const response = await fetch("/api/v1/uploads/gallery", {
-            method: "POST",
-            body: formData,
-          });
-
-          const data = await response.json();
+          // Mock upload - in production this would upload to real backend
+          await new Promise((resolve) => setTimeout(resolve, 300));
 
           return {
-            id: data.fileId || `img-${Date.now()}-${Math.random()}`,
+            id: `img-${Date.now()}-${Math.random()}`,
             url: URL.createObjectURL(file),
           };
         });

@@ -88,23 +88,18 @@ export const Step1BasicInfo = () => {
   const checkTitleUniqueness = async (title: string, country: string) => {
     setIsChecking(true);
     try {
-      // Simulate API call
-      const response = await fetch(
-        `/api/v1/routes?title=${encodeURIComponent(title)}&country=${country}`
-      );
-      const data = await response.json();
+      // Mock API call - in production this would check against real backend
+      await new Promise((resolve) => setTimeout(resolve, 500));
       
-      if (data.exists) {
-        form.setError("title", {
-          type: "manual",
-          message: "A route with this title already exists in this country.",
-        });
-        return false;
-      }
+      // For demo: simulate that titles are unique (return true)
+      // In production, this would query the backend:
+      // const response = await fetch(`/api/v1/routes?title=${encodeURIComponent(title)}&country=${country}`);
+      // const data = await response.json();
+      // return !data.exists;
+      
       return true;
     } catch (error) {
       console.error("Error checking title uniqueness:", error);
-      // For demo purposes, allow continuation
       return true;
     } finally {
       setIsChecking(false);
@@ -127,20 +122,14 @@ export const Step1BasicInfo = () => {
 
     setIsSaving(true);
     try {
-      // Simulate API call
-      const response = await fetch("/api/v1/routes", {
-        method: wizardData.routeId ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          id: wizardData.routeId,
-        }),
-      });
-
-      const result = await response.json();
+      // Mock API call - in production this would save to real backend
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      
+      // Generate mock route ID
+      const mockRouteId = wizardData.routeId || `route-${Date.now()}`;
       
       // Store route ID and step data
-      updateWizardData("routeId", result.id || "mock-route-id");
+      updateWizardData("routeId", mockRouteId);
       updateWizardData("step1", data);
 
       toast({
