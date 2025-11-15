@@ -3,6 +3,7 @@ import { WizardProgress } from "@/components/routes/wizard/WizardProgress";
 import { Step1BasicInfo } from "@/components/routes/wizard/Step1BasicInfo";
 import { Step2TechnicalInfo } from "@/components/routes/wizard/Step2TechnicalInfo";
 import { Step3EditorialContent } from "@/components/routes/wizard/Step3EditorialContent";
+import { Step4Media } from "@/components/routes/wizard/Step4Media";
 
 const CreateRouteContent = () => {
   const { currentStep } = useWizard();
@@ -22,7 +23,7 @@ const CreateRouteContent = () => {
         {currentStep === 1 && <Step1BasicInfo />}
         {currentStep === 2 && <Step2TechnicalInfo />}
         {currentStep === 3 && <Step3EditorialContent />}
-        {currentStep === 4 && <div className="text-center text-muted-foreground">Step 4 - Coming Soon</div>}
+        {currentStep === 4 && <Step4Media />}
       </div>
     </div>
   );
