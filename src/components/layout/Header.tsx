@@ -10,8 +10,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Search, User, LogOut } from "lucide-react";
+import { Search, User, LogOut } from "lucide-react";
 import GlobalSearch from "@/components/GlobalSearch";
+import { NotificationCenter } from "@/components/NotificationCenter";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -62,10 +63,7 @@ const Header = () => {
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
 
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full" />
-        </Button>
+        <NotificationCenter />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
