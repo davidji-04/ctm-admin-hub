@@ -16,7 +16,15 @@ interface WizardData {
     tipo_terreno: string;
     altura_max_veiculo?: number;
   };
-  step3?: any;
+  step3?: {
+    descricao: string;
+    historia_percurso?: string;
+    destaques_unicos?: string;
+    experiencia_cultural?: string;
+    desafios_esperados?: string;
+    certificacoes?: string;
+    relatos_equipe?: string;
+  };
   step4?: any;
 }
 
