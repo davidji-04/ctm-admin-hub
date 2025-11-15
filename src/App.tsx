@@ -10,6 +10,8 @@ import ComingSoon from "./pages/ComingSoon";
 import { CreateRoute } from "./pages/routes/CreateRoute";
 import { RouteDetails } from "./pages/routes/RouteDetails";
 import { LocalitiesManager } from "./pages/localities/LocalitiesManager";
+import UsersManager from "./pages/users/UsersManager";
+import UserProfile from "./pages/users/UserProfile";
 import NotFound from "./pages/NotFound";
 import MainLayout from "./components/layout/MainLayout";
 
@@ -37,7 +39,8 @@ const App = () => (
             <Route path="/equipment" element={<ComingSoon title="Equipment" description="Manage recommended equipment for routes" />} />
             <Route path="/training" element={<ComingSoon title="Training Programs" description="Create training plans and exercise sessions" />} />
             <Route path="/weather" element={<ComingSoon title="Weather Alerts" description="Configure weather alert rules and monitoring" />} />
-            <Route path="/users" element={<ComingSoon title="User Management" description="Manage free and premium users" />} />
+            <Route path="/users" element={<UsersManager />} />
+            <Route path="/users/:userId" element={<UserProfile />} />
             <Route path="/reviews" element={<ComingSoon title="Reviews" description="Moderate and respond to user reviews" />} />
             <Route path="/images" element={<ComingSoon title="Image Management" description="Organize and manage all media assets" />} />
             <Route path="/reports" element={<ComingSoon title="Reports & Analytics" description="Generate reports and view analytics" />} />
