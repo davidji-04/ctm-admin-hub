@@ -126,20 +126,12 @@ export const GPXUpload = ({ value, onChange }: GPXUploadProps) => {
         // Extract metadata
         const metadata = await extractGPXMetadata(file);
 
-        // Simulate upload
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const response = await fetch("/api/v1/uploads/gpx", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await response.json();
+        // Mock upload - in production this would upload to real backend
+        await new Promise((resolve) => setTimeout(resolve, 600));
 
         onChange({
-          id: data.fileId || `gpx-${Date.now()}`,
-          url: data.url || URL.createObjectURL(file),
+          id: `gpx-${Date.now()}`,
+          url: URL.createObjectURL(file),
           name: file.name,
           metadata,
         });
