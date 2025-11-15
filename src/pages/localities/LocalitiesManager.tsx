@@ -14,6 +14,7 @@ import {
   MapPin,
   Mountain,
   Clock,
+  Clock3,
 } from 'lucide-react';
 import { LocalityMap } from '@/components/localities/LocalityMap';
 import { AddEditLocalityModal } from '@/components/localities/AddEditLocalityModal';
@@ -203,47 +204,9 @@ export const LocalitiesManager = () => {
       // Mock API call
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      // Mock data
-      const mockLocalities: Locality[] = [
-        {
-          id: '1',
-          percurso_id: routeId || '',
-          nome: 'Porto',
-          ordem_no_percurso: 0,
-          latitude: 41.1579,
-          longitude: -8.6291,
-          elevacao_altimetria: 104,
-          distancia_localidade_anterior: 0,
-          tempo_estimado_da_anterior: 0,
-          dificuldade_nivel_tecnico: 'facil',
-          selo_badge: 'UNESCO',
-        },
-        {
-          id: '2',
-          percurso_id: routeId || '',
-          nome: 'Vila do Conde',
-          ordem_no_percurso: 1,
-          latitude: 41.3517,
-          longitude: -8.7391,
-          elevacao_altimetria: 25,
-          distancia_localidade_anterior: 27.5,
-          tempo_estimado_da_anterior: 330,
-          dificuldade_nivel_tecnico: 'media',
-        },
-        {
-          id: '3',
-          percurso_id: routeId || '',
-          nome: 'Barcelos',
-          ordem_no_percurso: 2,
-          latitude: 41.5318,
-          longitude: -8.6174,
-          elevacao_altimetria: 39,
-          distancia_localidade_anterior: 22.3,
-          tempo_estimado_da_anterior: 268,
-          dificuldade_nivel_tecnico: 'media',
-          selo_badge: 'Historic',
-        },
-      ];
+      // In production, check if this is a newly created route from wizard
+      // For now, start with empty array - user must add localities manually or via GPX
+      const mockLocalities: Locality[] = [];
 
       setLocalities(mockLocalities);
     } catch (error) {
@@ -422,6 +385,15 @@ export const LocalitiesManager = () => {
     }
   };
 
+  const handleFillLater = () => {
+    toast({
+      title: "Route saved",
+      description: "You can add localities to this route later from the Localities module.",
+    });
+    // In production, mark this route as "needs_localities" in the backend
+    navigate('/localities');
+  };
+
   const totalDistance = localities.reduce((sum, loc) => sum + loc.distancia_localidade_anterior, 0);
   const totalTime = localities.reduce((sum, loc) => sum + loc.tempo_estimado_da_anterior, 0);
 
@@ -438,6 +410,12 @@ export const LocalitiesManager = () => {
           </div>
         </div>
         <div className="flex gap-2">
+          {localities.length === 0 && (
+            <Button variant="outline" onClick={handleFillLater}>
+              <Clock3 className="h-4 w-4 mr-2" />
+              Fill Later
+            </Button>
+          )}
           {userRole === 'admin' && (
             <Button variant="outline" onClick={() => setShowGPXModal(true)}>
               <Upload className="h-4 w-4 mr-2" />
