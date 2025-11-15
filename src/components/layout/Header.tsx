@@ -11,17 +11,31 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Bell, Search, User, LogOut } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import GlobalSearch from "@/components/GlobalSearch";
 
 const Header = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     const userData = localStorage.getItem("ctm_user");
     if (userData) {
       setUser(JSON.parse(userData));
     }
+  }, []);
+
+  // Keyboard shortcut for global search (Cmd+K or Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   const handleLogout = () => {
@@ -32,14 +46,20 @@ const Header = () => {
   return (
     <header className="h-16 border-b border-border bg-card px-6 flex items-center justify-between">
       <div className="flex-1 max-w-xl">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search routes, localities, users..."
-            className="pl-10"
-          />
-        </div>
+        <Button
+          variant="outline"
+          className="w-full justify-start text-muted-foreground"
+          onClick={() => setSearchOpen(true)}
+        >
+          <Search className="mr-2 h-4 w-4" />
+          Search routes, localities, users...
+          <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+            <span className="text-xs">⌘</span>K
+          </kbd>
+        </Button>
       </div>
+
+      <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
 
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" className="relative">
