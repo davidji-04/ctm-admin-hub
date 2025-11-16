@@ -17,37 +17,37 @@ import {
 const Dashboard = () => {
   const stats = [
     {
-      title: "Total Routes",
+      title: "Total de Percursos",
       value: "47",
-      change: "+3 this month",
+      change: "+3 este mês",
       icon: Route,
       color: "text-primary",
     },
     {
-      title: "Total Users",
+      title: "Total de Utilizadores",
       value: "2,847",
-      change: "+156 this month",
+      change: "+156 este mês",
       icon: UserCheck,
       color: "text-info",
     },
     {
-      title: "Premium Users",
+      title: "Utilizadores Premium",
       value: "384",
-      change: "+42 this month",
+      change: "+42 este mês",
       icon: Crown,
       color: "text-warning",
     },
     {
-      title: "Average Rating",
+      title: "Avaliação Média",
       value: "4.8",
-      change: "+0.2 improvement",
+      change: "+0.2 melhoria",
       icon: Star,
       color: "text-success",
     },
     {
-      title: "Premium Itineraries",
+      title: "Roteiros Premium",
       value: "23",
-      change: "+5 this month",
+      change: "+5 este mês",
       icon: TrendingUp,
       color: "text-accent",
     },
@@ -76,29 +76,29 @@ const Dashboard = () => {
 
   // Mock data for Conversion Rate funnel
   const conversionData = [
-    { stage: "Free Sign-ups", value: 2463, percentage: 100 },
-    { stage: "Active Users", value: 1847, percentage: 75 },
-    { stage: "Trial Started", value: 923, percentage: 37 },
-    { stage: "Premium Converted", value: 384, percentage: 16 },
+    { stage: "Inscrições Grátis", value: 2463, percentage: 100 },
+    { stage: "Utilizadores Ativos", value: 1847, percentage: 75 },
+    { stage: "Período Experimental", value: 923, percentage: 37 },
+    { stage: "Conversão Premium", value: 384, percentage: 16 },
   ];
 
   const pendingActions = [
-    { id: 1, type: "Review", message: "New review pending approval", route: "Caminho Português" },
-    { id: 2, type: "Route", message: "Draft route needs publishing", route: "Via Algarviana" },
-    { id: 3, type: "Alert", message: "Weather alert triggered", route: "Rota Vicentina" },
+    { id: 1, type: "Avaliação", message: "Nova avaliação pendente de aprovação", route: "Caminho Português" },
+    { id: 2, type: "Percurso", message: "Rascunho de percurso precisa de publicação", route: "Via Algarviana" },
+    { id: 3, type: "Alerta", message: "Alerta meteorológico acionado", route: "Rota Vicentina" },
   ];
 
   const recentRoutes = [
-    { id: 1, name: "Caminho Português", status: "active", localities: 12, distance: "245 km" },
-    { id: 2, name: "Via Algarviana", status: "draft", localities: 8, distance: "187 km" },
-    { id: 3, name: "Rota Vicentina", status: "active", localities: 15, distance: "320 km" },
+    { id: 1, name: "Caminho Português", status: "ativo", localities: 12, distance: "245 km" },
+    { id: 2, name: "Via Algarviana", status: "rascunho", localities: 8, distance: "187 km" },
+    { id: 3, name: "Rota Vicentina", status: "ativo", localities: 15, distance: "320 km" },
   ];
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back! Here's what's happening with CTM.</p>
+        <p className="text-muted-foreground">Bem-vindo! Aqui está o que está a acontecer com o CTM.</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
@@ -118,13 +118,13 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* Data Visualizations - Charts */}
+      {/* Visualizações de Dados - Gráficos */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Active Users Line Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Active Users</CardTitle>
-            <CardDescription>Monthly active user trend</CardDescription>
+            <CardTitle>Utilizadores Ativos</CardTitle>
+            <CardDescription>Tendência mensal de utilizadores ativos</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -159,11 +159,11 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Most Accessed Routes Bar Chart */}
+        {/* Gráfico de Barras dos Percursos Mais Acedidos */}
         <Card>
           <CardHeader>
-            <CardTitle>Most Accessed Routes</CardTitle>
-            <CardDescription>Top 5 routes by access count</CardDescription>
+            <CardTitle>Percursos Mais Acedidos</CardTitle>
+            <CardDescription>Top 5 percursos por número de acessos</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -198,8 +198,8 @@ const Dashboard = () => {
       {/* Conversion Rate Funnel */}
       <Card>
         <CardHeader>
-          <CardTitle>Conversion Rate (FREE → PREMIUM)</CardTitle>
-          <CardDescription>User conversion funnel from sign-up to premium</CardDescription>
+          <CardTitle>Taxa de Conversão (GRÁTIS → PREMIUM)</CardTitle>
+          <CardDescription>Funil de conversão de utilizadores de inscrição a premium</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -208,7 +208,7 @@ const Dashboard = () => {
                 <div className="flex justify-between items-center text-sm">
                   <span className="font-medium">{stage.stage}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">{stage.value.toLocaleString()} users</span>
+                    <span className="text-muted-foreground">{stage.value.toLocaleString()} utilizadores</span>
                     <Badge variant="secondary">{stage.percentage}%</Badge>
                   </div>
                 </div>
@@ -228,7 +228,7 @@ const Dashboard = () => {
             ))}
             <div className="pt-4 border-t">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Overall Conversion Rate</span>
+                <span className="text-sm font-medium">Taxa de Conversão Global</span>
                 <Badge variant="default" className="text-base">
                   {((conversionData[3].value / conversionData[0].value) * 100).toFixed(1)}%
                 </Badge>
@@ -243,9 +243,9 @@ const Dashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-warning" />
-              Pending Actions
+              Ações Pendentes
             </CardTitle>
-            <CardDescription>Items requiring your attention</CardDescription>
+            <CardDescription>Itens que requerem sua atenção</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -268,9 +268,9 @@ const Dashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Route className="w-5 h-5 text-primary" />
-              Recent Routes
+              Percursos Recentes
             </CardTitle>
-            <CardDescription>Latest route activity</CardDescription>
+            <CardDescription>Atividade recente dos percursos</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -280,12 +280,12 @@ const Dashboard = () => {
                     <div className="flex items-center gap-2 mb-1">
                       <MapPin className="w-4 h-4 text-muted-foreground" />
                       <span className="text-sm font-medium">{route.name}</span>
-                      <Badge variant={route.status === "active" ? "default" : "secondary"}>
+                      <Badge variant={route.status === "ativo" ? "default" : "secondary"}>
                         {route.status}
                       </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {route.localities} localities • {route.distance}
+                      {route.localities} localidades • {route.distance}
                     </p>
                   </div>
                 </div>

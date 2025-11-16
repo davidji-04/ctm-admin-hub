@@ -130,17 +130,17 @@ export default function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) 
   const getCategoryLabel = (type: string) => {
     switch (type) {
       case "route":
-        return "Routes";
+        return "Percursos";
       case "locality":
-        return "Localities";
+        return "Localidades";
       case "user":
-        return "Free Users";
+        return "Utilizadores Gratuitos";
       case "premium-user":
-        return "Premium Users";
+        return "Utilizadores Premium";
       case "itinerary":
-        return "Itineraries";
+        return "Roteiros";
       default:
-        return "Other";
+        return "Outro";
     }
   };
 
@@ -157,13 +157,13 @@ export default function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
       <CommandInput 
-        placeholder="Search routes, localities, users, itineraries..." 
+        placeholder="Pesquisar percursos, localidades, utilizadores, roteiros..." 
         value={searchQuery}
         onValueChange={setSearchQuery}
       />
       <CommandList>
         <CommandEmpty>
-          {searchQuery.trim() ? "No results found." : "Start typing to search..."}
+          {searchQuery.trim() ? "Nenhum resultado encontrado." : "Comece a digitar para pesquisar..."}
         </CommandEmpty>
 
         {Object.entries(groupedResults).map(([type, results], index) => (

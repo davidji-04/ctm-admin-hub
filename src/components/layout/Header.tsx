@@ -53,7 +53,7 @@ const Header = () => {
           onClick={() => setSearchOpen(true)}
         >
           <Search className="mr-2 h-4 w-4" />
-          Search routes, localities, users...
+          Pesquisar percursos, localidades, utilizadores...
           <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
             <span className="text-xs">⌘</span>K
           </kbd>
@@ -80,14 +80,14 @@ const Header = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile Settings</DropdownMenuItem>
-            <DropdownMenuItem>Activity Log</DropdownMenuItem>
+            <DropdownMenuItem>Definições de Perfil</DropdownMenuItem>
+            <DropdownMenuItem>Registo de Atividade</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="text-destructive">
               <LogOut className="w-4 h-4 mr-2" />
-              Logout
+              Terminar Sessão
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
