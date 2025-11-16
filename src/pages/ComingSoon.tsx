@@ -18,7 +18,7 @@ const ComingSoon = ({ title, description }: ComingSoonProps) => {
           <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent className="text-center text-sm text-muted-foreground">
-          This module is under development and will be available soon.
+          Este módulo está em desenvolvimento e estará disponível em breve.
         </CardContent>
       </Card>
     </div>

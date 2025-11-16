@@ -29,15 +29,15 @@ const Login = () => {
         }));
         
         toast({
-          title: "Login successful",
-          description: "Welcome to CTM Admin Panel",
+          title: "Login bem-sucedido",
+          description: "Bem-vindo ao Painel de Administração CTM",
         });
         
         navigate("/dashboard");
       } else {
         toast({
-          title: "Login failed",
-          description: "Please enter valid credentials",
+          title: "Login falhou",
+          description: "Por favor, insira credenciais válidas",
           variant: "destructive",
         });
       }
@@ -52,9 +52,9 @@ const Login = () => {
           <div className="mx-auto w-16 h-16 rounded-full bg-primary flex items-center justify-center">
             <Leaf className="w-8 h-8 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl font-bold">CTM Admin Panel</CardTitle>
+          <CardTitle className="text-2xl font-bold">Painel de Administração CTM</CardTitle>
           <CardDescription>
-            Cheiro de Terra Molhada - Administrative System
+            Cheiro de Terra Molhada - Sistema Administrativo
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -71,7 +71,7 @@ const Login = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Palavra-passe</Label>
               <Input
                 id="password"
                 type="password"
@@ -86,11 +86,11 @@ const Login = () => {
               className="w-full" 
               disabled={isLoading}
             >
-              {isLoading ? "Signing in..." : "Sign In"}
+              {isLoading ? "A entrar..." : "Entrar"}
             </Button>
           </form>
           <div className="mt-4 text-center text-sm text-muted-foreground">
-            <p>Demo: Use any email with "admin" for admin role</p>
+            <p>Demo: Use qualquer email com "admin" para papel de administrador</p>
           </div>
         </CardContent>
       </Card>

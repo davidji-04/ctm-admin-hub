@@ -19,8 +19,8 @@ const mockNotifications: Notification[] = [
     id: 'notif-1',
     type: 'training_request',
     priority: 'critical',
-    title: 'Paid Training Request',
-    message: 'New premium client requesting guided tour for Caminho Português',
+    title: 'Pedido de Treino Pago',
+    message: 'Novo cliente premium a solicitar tour guiado para o Caminho Português',
     timestamp: new Date(Date.now() - 1000 * 60 * 15), // 15 min ago
     read: false,
     actionUrl: '/coming-soon', // Would be /premium-clients/:id
@@ -30,8 +30,8 @@ const mockNotifications: Notification[] = [
     id: 'notif-2',
     type: 'route_pending_approval',
     priority: 'important',
-    title: 'Route Pending Approval',
-    message: 'Editor submitted "Via Algarviana" for your review',
+    title: 'Percurso Pendente de Aprovação',
+    message: 'Editor submeteu "Via Algarviana" para sua revisão',
     timestamp: new Date(Date.now() - 1000 * 60 * 45), // 45 min ago
     read: false,
     actionUrl: '/routes/route-pending-123',
@@ -41,8 +41,8 @@ const mockNotifications: Notification[] = [
     id: 'notif-3',
     type: 'review_pending',
     priority: 'important',
-    title: 'New Review Pending Approval',
-    message: 'User submitted a 5-star review for "Caminho Francês"',
+    title: 'Nova Avaliação Pendente de Aprovação',
+    message: 'Utilizador submeteu uma avaliação de 5 estrelas para "Caminho Francês"',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
     read: false,
     actionUrl: '/coming-soon', // Would be /reviews/:id
@@ -52,8 +52,8 @@ const mockNotifications: Notification[] = [
     id: 'notif-4',
     type: 'weather_alert',
     priority: 'attention',
-    title: 'Weather Alert Triggered',
-    message: 'Heavy rain forecast for Serra da Estrela region',
+    title: 'Alerta Meteorológico Acionado',
+    message: 'Previsão de chuva forte para a região da Serra da Estrela',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5), // 5 hours ago
     read: true,
     actionUrl: '/coming-soon', // Would be /weather-alerts
@@ -63,8 +63,8 @@ const mockNotifications: Notification[] = [
     id: 'notif-5',
     type: 'route_published',
     priority: 'informative',
-    title: 'Your Route Was Published',
-    message: 'Admin approved and published "Rota Vicentina"',
+    title: 'Seu Percurso Foi Publicado',
+    message: 'Administrador aprovou e publicou "Rota Vicentina"',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
     read: true,
     actionUrl: '/routes/route-published-456',
@@ -74,8 +74,8 @@ const mockNotifications: Notification[] = [
     id: 'notif-6',
     type: 'user_signup',
     priority: 'informative',
-    title: 'New User Signed Up',
-    message: 'João Silva registered as a premium user',
+    title: 'Novo Utilizador Registado',
+    message: 'João Silva registou-se como utilizador premium',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48), // 2 days ago
     read: true,
     actionUrl: '/users',
@@ -123,12 +123,12 @@ const formatTimestamp = (date: Date) => {
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString();
+  if (diffMins < 1) return 'Agora mesmo';
+  if (diffMins < 60) return `há ${diffMins}min`;
+  if (diffHours < 24) return `há ${diffHours}h`;
+  if (diffDays === 1) return 'Ontem';
+  if (diffDays < 7) return `há ${diffDays}d`;
+  return date.toLocaleDateString('pt-PT');
 };
 
 export const NotificationCenter = () => {
@@ -180,15 +180,15 @@ export const NotificationCenter = () => {
       <DropdownMenuContent align="end" className="w-96 bg-card p-0 z-50">
         <div className="flex items-center justify-between p-4 pb-3">
           <div>
-            <h3 className="font-semibold text-foreground">Notifications</h3>
+            <h3 className="font-semibold text-foreground">Notificações</h3>
             <p className="text-xs text-muted-foreground">
-              {unreadCount > 0 ? `${unreadCount} unread` : 'All caught up!'}
+              {unreadCount > 0 ? `${unreadCount} não lidas` : 'Tudo em dia!'}
             </p>
           </div>
           {unreadCount > 0 && (
             <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-xs">
               <Check className="h-3 w-3 mr-1" />
-              Mark all read
+              Marcar todas como lidas
             </Button>
           )}
         </div>
@@ -197,7 +197,7 @@ export const NotificationCenter = () => {
           {sortedNotifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <Bell className="h-12 w-12 mb-2 opacity-20" />
-              <p className="text-sm">No notifications</p>
+              <p className="text-sm">Sem notificações</p>
             </div>
           ) : (
             <div className="divide-y divide-border">

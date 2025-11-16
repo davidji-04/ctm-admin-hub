@@ -18,17 +18,17 @@ import {
 
 const navigationItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Routes", href: "/routes", icon: Route },
-  { name: "Localities", href: "/localities", icon: MapPin },
-  { name: "Services", href: "/services", icon: Briefcase },
-  { name: "Itineraries", href: "/itineraries", icon: CalendarDays },
-  { name: "Equipment", href: "/equipment", icon: Package },
-  { name: "Training", href: "/training", icon: GraduationCap },
-  { name: "Weather Alerts", href: "/weather", icon: CloudRain },
-  { name: "Users", href: "/users", icon: Users },
-  { name: "Reviews", href: "/reviews", icon: Star },
-  { name: "Images", href: "/images", icon: Image },
-  { name: "Reports", href: "/reports", icon: FileText },
+  { name: "Percursos", href: "/routes", icon: Route },
+  { name: "Localidades", href: "/localities", icon: MapPin },
+  { name: "Serviços", href: "/services", icon: Briefcase },
+  { name: "Roteiros", href: "/itineraries", icon: CalendarDays },
+  { name: "Equipamentos", href: "/equipment", icon: Package },
+  { name: "Treino", href: "/training", icon: GraduationCap },
+  { name: "Alertas Meteo", href: "/weather", icon: CloudRain },
+  { name: "Utilizadores", href: "/users", icon: Users },
+  { name: "Avaliações", href: "/reviews", icon: Star },
+  { name: "Imagens", href: "/images", icon: Image },
+  { name: "Relatórios", href: "/reports", icon: FileText },
 ];
 
 const Sidebar = () => {
@@ -41,7 +41,7 @@ const Sidebar = () => {
           </div>
           <div>
             <h1 className="text-lg font-bold text-sidebar-foreground">CTM Admin</h1>
-            <p className="text-xs text-sidebar-foreground/70">Management Panel</p>
+            <p className="text-xs text-sidebar-foreground/70">Painel de Gestão</p>
           </div>
         </div>
       </div>
@@ -69,7 +69,7 @@ const Sidebar = () => {
       <div className="p-4 border-t border-sidebar-border">
         <div className="text-xs text-sidebar-foreground/60">
           <p>© 2024 CTM</p>
-          <p>Version 1.0.0</p>
+          <p>Versão 1.0.0</p>
         </div>
       </div>
     </aside>
