@@ -16,6 +16,9 @@ import EquipmentList from "./pages/equipment/EquipmentList";
 import ImageGallery from "./pages/images/ImageGallery";
 import UsersManager from "./pages/users/UsersManager";
 import UserProfile from "./pages/users/UserProfile";
+import PremiumItinerariesList from "./pages/itineraries/PremiumItinerariesList";
+import CreateItinerary from "./pages/itineraries/CreateItinerary";
+import ManageItinerary from "./pages/itineraries/ManageItinerary";
 import NotFound from "./pages/NotFound";
 import MainLayout from "./components/layout/MainLayout";
 
@@ -39,7 +42,9 @@ const App = () => (
             <Route path="/routes/:routeId/localities" element={<LocalitiesManager />} />
             <Route path="/localities" element={<LocalitiesList />} />
             <Route path="/services" element={<ServicesList />} />
-            <Route path="/itineraries" element={<ComingSoon title="Premium Itineraries" description="Create and manage multi-day itineraries" />} />
+            <Route path="/itineraries" element={<PremiumItinerariesList />} />
+            <Route path="/itineraries/create" element={<CreateItinerary />} />
+            <Route path="/itineraries/:id" element={<ManageItinerary />} />
             <Route path="/equipment" element={<EquipmentList />} />
             <Route path="/training" element={<ComingSoon title="Training Programs" description="Create training plans and exercise sessions" />} />
             <Route path="/weather" element={<ComingSoon title="Weather Alerts" description="Configure weather alert rules and monitoring" />} />
