@@ -80,16 +80,10 @@ const Header = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">{user?.name || "User"}</p>
-                <Badge variant="secondary" className="text-xs w-fit">
-                  {user?.role || "editor"}
-                </Badge>
-              </div>
-            </DropdownMenuLabel>
+            <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Definições de Perfil</DropdownMenuItem>
+            <DropdownMenuItem>Registo de Atividade</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="text-destructive">
               <LogOut className="w-4 h-4 mr-2" />
