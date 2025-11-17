@@ -16,6 +16,8 @@ import EquipmentList from "./pages/equipment/EquipmentList";
 import ImageGallery from "./pages/images/ImageGallery";
 import UsersManager from "./pages/users/UsersManager";
 import UserProfile from "./pages/users/UserProfile";
+import MyProfile from "./pages/users/MyProfile";
+import ActivityLog from "./pages/users/ActivityLog";
 import PremiumItinerariesList from "./pages/itineraries/PremiumItinerariesList";
 import CreateItinerary from "./pages/itineraries/CreateItinerary";
 import ManageItinerary from "./pages/itineraries/ManageItinerary";
@@ -50,6 +52,8 @@ const App = () => (
             <Route path="/weather" element={<ComingSoon title="Weather Alerts" description="Configure weather alert rules and monitoring" />} />
             <Route path="/users" element={<UsersManager />} />
             <Route path="/users/:userId" element={<UserProfile />} />
+            <Route path="/my-profile" element={<MyProfile />} />
+            <Route path="/activity-log" element={<ActivityLog />} />
             <Route path="/reviews" element={<ComingSoon title="Reviews" description="Moderate and respond to user reviews" />} />
             <Route path="/images" element={<ImageGallery />} />
             <Route path="/reports" element={<ComingSoon title="Reports & Analytics" description="Generate reports and view analytics" />} />

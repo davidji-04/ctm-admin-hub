@@ -82,8 +82,8 @@ const Header = () => {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Definições de Perfil</DropdownMenuItem>
-            <DropdownMenuItem>Registo de Atividade</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/my-profile")}>Definições de Perfil</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/activity-log")}>Registo de Atividade</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="text-destructive">
               <LogOut className="w-4 h-4 mr-2" />
