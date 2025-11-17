@@ -67,7 +67,11 @@ const Header = () => {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="gap-2">
+            <Button 
+              variant="ghost" 
+              className="gap-2"
+              onClick={() => navigate("/my-profile")}
+            >
               <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                 <User className="w-4 h-4 text-primary-foreground" />
               </div>
@@ -80,10 +84,9 @@ const Header = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate("/my-profile")}>Definições de Perfil</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/activity-log")}>Registo de Atividade</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/my-profile")}>
+              Definições de Perfil
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="text-destructive">
               <LogOut className="w-4 h-4 mr-2" />
