@@ -161,15 +161,6 @@ export const LocalityEditor = ({
 
       {/* Content Area */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 overflow-hidden">
-        {/* Interactive Map */}
-        <div className="h-full min-h-[400px]">
-          <LocalityMap
-            localities={localities}
-            selectedLocalityId={selectedLocalityId}
-            height="100%"
-          />
-        </div>
-
         {/* Sequential Locality List */}
         <div className="h-full overflow-y-auto">
           <LocalitySequenceList
