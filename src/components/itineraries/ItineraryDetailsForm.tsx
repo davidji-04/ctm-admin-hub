@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -15,11 +16,14 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { TrainingPlanSelector } from './TrainingPlanSelector';
+import { useState } from 'react';
 
 const formSchema = z.object({
   title: z.string().min(3, 'Título deve ter pelo menos 3 caracteres'),
   startDate: z.string().min(1, 'Data de início é obrigatória'),
   duration: z.coerce.number().min(1, 'Duração deve ser pelo menos 1 dia'),
+  trainingPlanId: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -36,12 +40,15 @@ export const ItineraryDetailsForm = ({
   routeName,
   onSubmit,
 }: ItineraryDetailsFormProps) => {
+  const [showTrainingPlanSelector, setShowTrainingPlanSelector] = useState(false);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: `${routeName || 'Roteiro'} - ${clientName || 'Cliente'}`,
       startDate: '',
       duration: 30,
+      trainingPlanId: '',
       notes: '',
     },
   });
@@ -118,6 +125,64 @@ export const ItineraryDetailsForm = ({
               </FormItem>
             )}
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Plano de Treino (Opcional)</Label>
+          {!showTrainingPlanSelector ? (
+            <div className="space-y-2">
+              {form.watch('trainingPlanId') ? (
+                <Card>
+                  <CardContent className="pt-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium">Plano vinculado</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          O cliente terá acesso ao plano de preparação
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => form.setValue('trainingPlanId', '')}
+                      >
+                        Remover
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Nenhum plano de treino vinculado
+                </p>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowTrainingPlanSelector(true)}
+              >
+                {form.watch('trainingPlanId') ? 'Alterar Plano' : 'Vincular Plano de Treino'}
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <TrainingPlanSelector
+                selectedPlanId={form.watch('trainingPlanId')}
+                onPlanSelect={(planId) => {
+                  form.setValue('trainingPlanId', planId || '');
+                  setShowTrainingPlanSelector(false);
+                }}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setShowTrainingPlanSelector(false)}
+              >
+                Cancelar
+              </Button>
+            </div>
+          )}
         </div>
 
         <FormField
