@@ -15,11 +15,13 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { PremiumItinerary, ITINERARY_STATUS_LABELS } from '@/types/premium-itinerary';
 import { StagesList } from '@/components/itineraries/StagesList';
 import { SchedulesOverview } from '@/components/itineraries/SchedulesOverview';
+import { AddEditStageModal } from '@/components/itineraries/AddEditStageModal';
 import { toast } from 'sonner';
 
 const ManageItinerary = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [isAddStageModalOpen, setIsAddStageModalOpen] = useState(false);
 
   const [itinerary] = useState<PremiumItinerary>({
     id: id || '1',
@@ -190,7 +192,7 @@ const ManageItinerary = () => {
                     Gerir etapas personalizadas baseadas nas capacidades do cliente
                   </CardDescription>
                 </div>
-                <Button>
+                <Button onClick={() => setIsAddStageModalOpen(true)}>
                   <Plus className="w-4 h-4 mr-2" />
                   Adicionar Etapa
                 </Button>
@@ -259,6 +261,12 @@ const ManageItinerary = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <AddEditStageModal
+        open={isAddStageModalOpen}
+        onOpenChange={setIsAddStageModalOpen}
+        order={itinerary.stages.length + 1}
+      />
     </div>
   );
 };

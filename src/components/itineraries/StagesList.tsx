@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Edit, Trash2, MapPin, Clock, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,12 +10,19 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ItineraryStage, SCHEDULE_STATUS_LABELS } from '@/types/premium-itinerary';
+import { AddEditStageModal } from './AddEditStageModal';
+import { AddEditScheduleModal } from './AddEditScheduleModal';
 
 interface StagesListProps {
   stages: ItineraryStage[];
 }
 
 export const StagesList = ({ stages }: StagesListProps) => {
+  const [editingStage, setEditingStage] = useState<ItineraryStage | undefined>();
+  const [isStageModalOpen, setIsStageModalOpen] = useState(false);
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [selectedStageForSchedule, setSelectedStageForSchedule] = useState<ItineraryStage | undefined>();
+
   const getDifficultyColor = (difficulty?: string) => {
     switch (difficulty) {
       case 'easy':
@@ -53,8 +61,9 @@ export const StagesList = ({ stages }: StagesListProps) => {
   }
 
   return (
-    <div className="space-y-4">
-      {stages.map((stage) => (
+    <>
+      <div className="space-y-4">
+        {stages.map((stage) => (
         <Card key={stage.id}>
           <CardHeader>
             <div className="flex items-start justify-between">
@@ -68,7 +77,14 @@ export const StagesList = ({ stages }: StagesListProps) => {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setEditingStage(stage);
+                    setIsStageModalOpen(true);
+                  }}
+                >
                   <Edit className="w-4 h-4" />
                 </Button>
                 <Button variant="outline" size="sm">
@@ -178,7 +194,21 @@ export const StagesList = ({ stages }: StagesListProps) => {
             )}
           </CardContent>
         </Card>
-      ))}
-    </div>
+        ))}
+      </div>
+
+      <AddEditStageModal
+        open={isStageModalOpen}
+        onOpenChange={setIsStageModalOpen}
+        stage={editingStage}
+        order={stages.length + 1}
+      />
+
+      <AddEditScheduleModal
+        open={isScheduleModalOpen}
+        onOpenChange={setIsScheduleModalOpen}
+        stageTitle={selectedStageForSchedule?.title || ''}
+      />
+    </>
   );
 };

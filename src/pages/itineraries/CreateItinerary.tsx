@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,12 +10,37 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { ClientSelector } from '@/components/itineraries/ClientSelector';
+import { RouteSelector } from '@/components/itineraries/RouteSelector';
+import { ItineraryDetailsForm } from '@/components/itineraries/ItineraryDetailsForm';
 import { toast } from 'sonner';
 
 const CreateItinerary = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const [selectedClientId, setSelectedClientId] = useState<string>();
+  const [selectedRouteId, setSelectedRouteId] = useState<string>();
+  const detailsFormRef = useRef<HTMLFormElement>(null);
   const totalSteps = 3;
+
+  // Mock data - replace with actual API calls
+  const getClientName = (id?: string) => {
+    const clients: Record<string, string> = {
+      'client-1': 'João Silva',
+      'client-2': 'Maria Santos',
+      'client-3': 'Pedro Costa',
+    };
+    return id ? clients[id] : undefined;
+  };
+
+  const getRouteName = (id?: string) => {
+    const routes: Record<string, string> = {
+      'route-1': 'Caminho Francês',
+      'route-2': 'Caminho Português',
+      'route-3': 'Caminho do Norte',
+    };
+    return id ? routes[id] : undefined;
+  };
 
   const steps = [
     { number: 1, title: 'Selecionar Cliente', description: 'Escolha o cliente para este roteiro' },
@@ -24,13 +49,31 @@ const CreateItinerary = () => {
   ];
 
   const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      // Create itinerary
-      toast.success('Roteiro premium criado com sucesso!');
-      navigate('/itineraries');
+    if (currentStep === 1 && !selectedClientId) {
+      toast.error('Por favor, selecione um cliente');
+      return;
     }
+    if (currentStep === 2 && !selectedRouteId) {
+      toast.error('Por favor, selecione um percurso premium');
+      return;
+    }
+    if (currentStep === 3) {
+      // Trigger form submission
+      const submitButton = document.getElementById('details-form-submit');
+      submitButton?.click();
+      return;
+    }
+    setCurrentStep(currentStep + 1);
+  };
+
+  const handleDetailsSubmit = (data: any) => {
+    console.log('Creating itinerary:', {
+      clientId: selectedClientId,
+      routeId: selectedRouteId,
+      ...data,
+    });
+    toast.success('Roteiro premium criado com sucesso!');
+    navigate('/itineraries');
   };
 
   const handleBack = () => {
@@ -112,52 +155,28 @@ const CreateItinerary = () => {
           {/* Step content */}
           <div className="min-h-[400px] py-8">
             {currentStep === 1 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Selecionar Cliente</h3>
-                <p className="text-muted-foreground">
-                  Selecione o cliente para quem este roteiro será criado. O sistema
-                  considerará as capacidades físicas e preferências do cliente.
-                </p>
-                {/* Add client selector component here */}
-                <div className="p-8 border-2 border-dashed rounded-lg text-center text-muted-foreground">
-                  Seletor de clientes será implementado aqui
-                </div>
-              </div>
+              <ClientSelector
+                selectedClientId={selectedClientId}
+                onClientSelect={setSelectedClientId}
+              />
             )}
 
             {currentStep === 2 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Selecionar Percurso Premium</h3>
-                <p className="text-muted-foreground">
-                  Selecione o percurso premium base. Apenas percursos categorizados como
-                  'Premium' podem ser usados para roteiros premium.
-                </p>
-                <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                  <p className="text-sm text-yellow-700 dark:text-yellow-500">
-                    <strong>RN-003:</strong> Roteiros premium só podem ser criados a partir
-                    de percursos categorizados como 'Premium'. Se o percurso desejado é
-                    'Free', duplique-o e altere a categoria primeiro.
-                  </p>
-                </div>
-                {/* Add route selector component here */}
-                <div className="p-8 border-2 border-dashed rounded-lg text-center text-muted-foreground">
-                  Seletor de percursos premium será implementado aqui
-                </div>
-              </div>
+              <RouteSelector
+                selectedRouteId={selectedRouteId}
+                onRouteSelect={setSelectedRouteId}
+              />
             )}
 
             {currentStep === 3 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Detalhes do Roteiro</h3>
-                <p className="text-muted-foreground">
-                  Configure os detalhes principais do roteiro, incluindo título, datas
-                  e informações adicionais.
-                </p>
-                {/* Add details form here */}
-                <div className="p-8 border-2 border-dashed rounded-lg text-center text-muted-foreground">
-                  Formulário de detalhes será implementado aqui
-                </div>
-              </div>
+              <>
+                <ItineraryDetailsForm
+                  clientName={getClientName(selectedClientId)}
+                  routeName={getRouteName(selectedRouteId)}
+                  onSubmit={handleDetailsSubmit}
+                />
+                <button id="details-form-submit" type="submit" className="hidden" />
+              </>
             )}
           </div>
 
