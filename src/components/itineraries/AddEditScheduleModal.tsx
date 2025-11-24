@@ -29,11 +29,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { StageSchedule } from '@/types/premium-itinerary';
+import { ServiceSelector } from './ServiceSelector';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 const formSchema = z.object({
   type: z.enum(['accommodation', 'restaurant', 'activity', 'transport', 'other']),
   title: z.string().min(3, 'Título deve ter pelo menos 3 caracteres'),
+  serviceId: z.string().optional(),
   serviceName: z.string().optional(),
   status: z.enum(['pending', 'confirmed', 'cancelled']),
   bookingReference: z.string().optional(),
@@ -58,12 +61,14 @@ export const AddEditScheduleModal = ({
   stageTitle,
 }: AddEditScheduleModalProps) => {
   const isEditing = !!schedule;
+  const [showServiceSelector, setShowServiceSelector] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       type: schedule?.type || 'accommodation',
       title: schedule?.title || '',
+      serviceId: schedule?.serviceId || '',
       serviceName: schedule?.serviceName || '',
       status: schedule?.status || 'pending',
       bookingReference: schedule?.bookingReference || '',
@@ -160,22 +165,60 @@ export const AddEditScheduleModal = ({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="serviceName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Serviço Vinculado</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Nome do estabelecimento ou serviço" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Link para o serviço cadastrado no sistema
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+            <div className="space-y-2">
+              <FormLabel>Serviço Vinculado (Opcional)</FormLabel>
+              {!showServiceSelector ? (
+                <div className="space-y-2">
+                  {form.watch('serviceName') ? (
+                    <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                      <span className="text-sm">{form.watch('serviceName')}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          form.setValue('serviceId', '');
+                          form.setValue('serviceName', '');
+                        }}
+                      >
+                        Remover
+                      </Button>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Nenhum serviço vinculado
+                    </p>
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowServiceSelector(true)}
+                  >
+                    {form.watch('serviceName') ? 'Alterar Serviço' : 'Vincular Serviço'}
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <ServiceSelector
+                    selectedServiceId={form.watch('serviceId')}
+                    onServiceSelect={(serviceId, serviceName) => {
+                      form.setValue('serviceId', serviceId);
+                      form.setValue('serviceName', serviceName);
+                      setShowServiceSelector(false);
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowServiceSelector(false)}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
               )}
-            />
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField

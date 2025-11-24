@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Edit, Trash2, MapPin, Clock, TrendingUp } from 'lucide-react';
+import { Edit, Trash2, MapPin, Clock, TrendingUp, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -150,11 +150,24 @@ export const StagesList = ({ stages }: StagesListProps) => {
               </div>
             )}
 
-            {stage.schedules.length > 0 && (
-              <div className="space-y-2">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
                 <p className="text-sm font-medium">
                   Programações ({stage.schedules.length})
                 </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedStageForSchedule(stage);
+                    setIsScheduleModalOpen(true);
+                  }}
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Adicionar
+                </Button>
+              </div>
+              {stage.schedules.length > 0 ? (
                 <div className="space-y-2">
                   {stage.schedules.map((schedule) => (
                     <div
@@ -183,8 +196,12 @@ export const StagesList = ({ stages }: StagesListProps) => {
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Nenhuma programação adicionada
+                </p>
+              )}
+            </div>
 
             {stage.notes && (
               <div className="pt-2 border-t">
