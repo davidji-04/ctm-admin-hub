@@ -49,21 +49,16 @@ interface AddEditServiceModalProps {
   onOpenChange: (open: boolean) => void;
   onSave: (service: ServiceFormData) => void;
   service?: Service;
+  localities: Array<{ id: string; name: string }>;
 }
 
-// Mock localities for the linking feature
-const MOCK_LOCALITIES = [
-  { id: 'loc-1', name: 'Porto' },
-  { id: 'loc-2', name: 'Barcelos' },
-  { id: 'loc-3', name: 'Ponte de Lima' },
-  { id: 'loc-4', name: 'Valença' },
-];
 
 export const AddEditServiceModal = ({
   open,
   onOpenChange,
   onSave,
   service,
+  localities,
 }: AddEditServiceModalProps) => {
   const [selectedLocalities, setSelectedLocalities] = useState<string[]>([]);
 
@@ -320,7 +315,7 @@ export const AddEditServiceModal = ({
                 Selecione as localidades onde este serviço está disponível
               </p>
               <div className="space-y-2 border rounded-md p-4">
-                {MOCK_LOCALITIES.map((locality) => (
+                {localities.map((locality) => (
                   <div key={locality.id} className="flex items-center space-x-2">
                     <Checkbox
                       id={locality.id}

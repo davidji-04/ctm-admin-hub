@@ -35,7 +35,7 @@ const MOCK_ROUTES = [
   },
 ];
 
-const MOCK_LOCALITIES: Record<string, Locality[]> = {
+export const MOCK_LOCALITIES: Record<string, Locality[]> = {
   'route-2': [
     {
       id: 'loc-1',

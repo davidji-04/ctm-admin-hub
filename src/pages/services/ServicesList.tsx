@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,11 +14,28 @@ import { Service, ServiceCategory, SERVICE_CATEGORY_LABELS } from '@/types/servi
 import { ServiceCard } from '@/components/services/ServiceCard';
 import { AddEditServiceModal } from '@/components/services/AddEditServiceModal';
 import { DeleteServiceModal } from '@/components/services/DeleteServiceModal';
+import { MOCK_LOCALITIES } from '@/pages/localities/LocalitiesList';
+
 
 const ServicesList = () => {
   const [searchParams] = useSearchParams();
   const localityFilter = searchParams.get('locality');
-  
+
+  const localities = useMemo(() => {
+    const allLocalities: Array<{ id: string; name: string }> = [];
+    
+    Object.values(MOCK_LOCALITIES).forEach((routeLocalities) => {
+      routeLocalities.forEach((locality) => {
+          allLocalities.push({
+            id: locality.id,
+            name: locality.nome,
+          });
+        });
+    });
+    
+    return allLocalities.sort((a, b) => a.name.localeCompare(b.name));
+  }, []);
+
   const [services, setServices] = useState<Service[]>([
     {
       id: '1',
@@ -145,6 +162,7 @@ const ServicesList = () => {
         open={isAddModalOpen}
         onOpenChange={setIsAddModalOpen}
         onSave={handleAddService}
+        localities={localities}
       />
 
       <AddEditServiceModal
@@ -152,6 +170,7 @@ const ServicesList = () => {
         onOpenChange={(open) => !open && setEditingService(null)}
         onSave={handleEditService}
         service={editingService || undefined}
+        localities={localities}
       />
 
       <DeleteServiceModal
