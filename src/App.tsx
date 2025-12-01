@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import RoutesPage from "./pages/Routes";
+import Reviews from "./pages/Reviews";
+import { ReviewDetails }from "./pages/reviews/ReviewDetails";
 import ComingSoon from "./pages/ComingSoon";
 import { CreateRoute } from "./pages/routes/CreateRoute";
 import { RouteDetails } from "./pages/routes/RouteDetails";
@@ -50,7 +52,8 @@ const App = () => (
             <Route path="/weather" element={<ComingSoon title="Weather Alerts" description="Configure weather alert rules and monitoring" />} />
             <Route path="/users" element={<UsersManager />} />
             <Route path="/users/:userId" element={<UserProfile />} />
-            <Route path="/reviews" element={<ComingSoon title="Reviews" description="Moderate and respond to user reviews" />} />
+            <Route path="/reviews" element={<Reviews/>} />
+            <Route path="/reviews/:reviewId" element={<ReviewDetails />} />
             <Route path="/images" element={<ImageGallery />} />
             <Route path="/reports" element={<ComingSoon title="Reports & Analytics" description="Generate reports and view analytics" />} />
           </Route>
