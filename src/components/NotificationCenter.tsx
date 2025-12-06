@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,78 +9,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 import { Bell, AlertCircle, Info, AlertTriangle, Zap, Check } from 'lucide-react';
-import { Notification, NotificationPriority } from '@/types/notification';
+import { NotificationPriority } from '@/types/notification';
+import { useNotifications } from '@/contexts/NotificationContext';
 import { cn } from '@/lib/utils';
-
-// Mock notifications data - in production, this would come from an API
-const mockNotifications: Notification[] = [
-  {
-    id: 'notif-1',
-    type: 'training_request',
-    priority: 'critical',
-    title: 'Pedido de Treino Pago',
-    message: 'Novo cliente premium a solicitar tour guiado para o Caminho Português',
-    timestamp: new Date(Date.now() - 1000 * 60 * 15), // 15 min ago
-    read: false,
-    actionUrl: '/coming-soon', // Would be /premium-clients/:id
-    metadata: { clientId: 'client-123' },
-  },
-  {
-    id: 'notif-2',
-    type: 'route_pending_approval',
-    priority: 'important',
-    title: 'Percurso Pendente de Aprovação',
-    message: 'Editor submeteu "Via Algarviana" para sua revisão',
-    timestamp: new Date(Date.now() - 1000 * 60 * 45), // 45 min ago
-    read: false,
-    actionUrl: '/routes/route-pending-123',
-    metadata: { routeId: 'route-pending-123', editorId: 'user-456' },
-  },
-  {
-    id: 'notif-3',
-    type: 'review_pending',
-    priority: 'important',
-    title: 'Nova Avaliação Pendente de Aprovação',
-    message: 'Utilizador submeteu uma avaliação de 5 estrelas para "Caminho Francês"',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-    read: false,
-    actionUrl: '/coming-soon', // Would be /reviews/:id
-    metadata: { reviewId: 'review-789', routeId: 'route-123' },
-  },
-  {
-    id: 'notif-4',
-    type: 'weather_alert',
-    priority: 'attention',
-    title: 'Alerta Meteorológico Acionado',
-    message: 'Previsão de chuva forte para a região da Serra da Estrela',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5), // 5 hours ago
-    read: true,
-    actionUrl: '/coming-soon', // Would be /weather-alerts
-    metadata: { region: 'serra-estrela' },
-  },
-  {
-    id: 'notif-5',
-    type: 'route_published',
-    priority: 'informative',
-    title: 'Seu Percurso Foi Publicado',
-    message: 'Administrador aprovou e publicou "Rota Vicentina"',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-    read: true,
-    actionUrl: '/routes/route-published-456',
-    metadata: { routeId: 'route-published-456' },
-  },
-  {
-    id: 'notif-6',
-    type: 'user_signup',
-    priority: 'informative',
-    title: 'Novo Utilizador Registado',
-    message: 'João Silva registou-se como utilizador premium',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48), // 2 days ago
-    read: true,
-    actionUrl: '/users',
-    metadata: { userId: 'user-new-123' },
-  },
-];
+import { useState } from 'react';
 
 const priorityOrder: Record<NotificationPriority, number> = {
   critical: 1,
@@ -133,7 +64,7 @@ const formatTimestamp = (date: Date) => {
 
 export const NotificationCenter = () => {
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const { notifications, markAsRead, markAllAsRead, unreadCount } = useNotifications();
   const [open, setOpen] = useState(false);
 
   // Sort notifications by priority and timestamp
@@ -143,23 +74,15 @@ export const NotificationCenter = () => {
     return b.timestamp.getTime() - a.timestamp.getTime();
   });
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
-
-  const handleNotificationClick = (notification: Notification) => {
+  const handleNotificationClick = (notification: typeof notifications[0]) => {
     // Mark as read
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === notification.id ? { ...n, read: true } : n))
-    );
+    markAsRead(notification.id);
 
     // Navigate to action URL
     if (notification.actionUrl) {
       navigate(notification.actionUrl);
       setOpen(false);
     }
-  };
-
-  const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
   return (
