@@ -1,21 +1,113 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Settings, History, MapPin } from 'lucide-react';
+import { Plus, Settings, History, MapPin, Zap } from 'lucide-react';
 import { AlertRulesList } from '@/components/weather/AlertRulesList';
 import { AlertsHistory } from '@/components/weather/AlertsHistory';
 import { WeatherMap } from '@/components/weather/WeatherMap';
 import { AlertRuleModal } from '@/components/weather/AlertRuleModal';
-import { mockAlertRules, mockWeatherAlerts } from '@/data/weatherMocks';
-import { AlertRule, WeatherAlert } from '@/types/weather';
+import { mockAlertRules, mockWeatherAlerts, mockRoutes, mockLocalities } from '@/data/weatherMocks';
+import { AlertRule, WeatherAlert, WEATHER_CONDITIONS } from '@/types/weather';
+import { useNotifications } from '@/contexts/NotificationContext';
+import { toast } from 'sonner';
 
 export default function WeatherAlerts() {
+  const { addNotification } = useNotifications();
   const [activeTab, setActiveTab] = useState('rules');
   const [isRuleModalOpen, setIsRuleModalOpen] = useState(false);
   const [selectedRule, setSelectedRule] = useState<AlertRule | null>(null);
   const [rules, setRules] = useState<AlertRule[]>(mockAlertRules);
   const [alerts, setAlerts] = useState<WeatherAlert[]>(mockWeatherAlerts);
+
+  // Sync existing active alerts to notification center on mount
+  useEffect(() => {
+    const activeAlerts = mockWeatherAlerts.filter(a => a.status === 'active');
+    activeAlerts.forEach(alert => {
+      addNotification({
+        type: 'weather_alert',
+        priority: 'attention',
+        title: 'Alerta Meteorológico',
+        message: alert.message,
+        actionUrl: '/weather',
+        metadata: {
+          alertId: alert.id,
+          routeId: alert.routeId,
+          localityId: alert.localityId,
+        },
+      });
+    });
+  }, []); // Only run once on mount
+
+  // Function to simulate triggering a new weather alert
+  const simulateNewAlert = () => {
+    const activeRules = rules.filter(r => r.isActive);
+    if (activeRules.length === 0) {
+      toast.error('Nenhuma regra ativa para simular alertas');
+      return;
+    }
+
+    // Pick a random active rule
+    const rule = activeRules[Math.floor(Math.random() * activeRules.length)];
+    
+    // Pick a random route from the rule
+    const routeId = rule.routeIds[Math.floor(Math.random() * rule.routeIds.length)];
+    const route = mockRoutes.find(r => r.id === routeId);
+    
+    // Pick a random locality from the route
+    const routeLocalities = mockLocalities.filter(l => l.routeId === routeId);
+    const locality = routeLocalities[Math.floor(Math.random() * routeLocalities.length)];
+    
+    // Pick a random condition from the rule
+    const condition = rule.conditions[Math.floor(Math.random() * rule.conditions.length)];
+    const conditionConfig = WEATHER_CONDITIONS.find(c => c.id === condition);
+
+    if (!route || !locality || !conditionConfig) return;
+
+    // Generate a mock condition value
+    const conditionValue = `${conditionConfig.label} detectado`;
+
+    // Create the new alert
+    const newAlert: WeatherAlert = {
+      id: `alert-${Date.now()}`,
+      ruleId: rule.id,
+      ruleName: rule.name,
+      priority: rule.priority,
+      routeId: route.id,
+      routeName: route.name,
+      localityId: locality.id,
+      localityName: locality.name,
+      condition: condition,
+      conditionValue: conditionValue,
+      message: rule.messageTemplate
+        .replace('[Nome do Percurso]', route.name)
+        .replace('[Nome da Localidade]', locality.name)
+        .replace('[Condição]', conditionConfig.label),
+      triggeredAt: new Date(),
+      status: 'active',
+      latitude: locality.latitude,
+      longitude: locality.longitude,
+    };
+
+    // Add to alerts list
+    setAlerts(prev => [newAlert, ...prev]);
+
+    // Add to notification center
+    addNotification({
+      type: 'weather_alert',
+      priority: 'attention',
+      title: 'Alerta Meteorológico Acionado',
+      message: newAlert.message,
+      actionUrl: '/weather',
+      metadata: {
+        alertId: newAlert.id,
+        routeId: newAlert.routeId,
+        localityId: newAlert.localityId,
+      },
+    });
+
+    toast.success('Alerta meteorológico simulado com sucesso!');
+  };
 
   const handleCreateRule = () => {
     setSelectedRule(null);
@@ -79,10 +171,16 @@ export default function WeatherAlerts() {
             Configure regras de alerta e monitore condições meteorológicas nos percursos
           </p>
         </div>
-        <Button onClick={handleCreateRule} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Nova Regra de Alerta
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={simulateNewAlert} className="gap-2">
+            <Zap className="h-4 w-4" />
+            Simular Alerta
+          </Button>
+          <Button onClick={handleCreateRule} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Nova Regra de Alerta
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
