@@ -21,6 +21,7 @@ import UserProfile from "./pages/users/UserProfile";
 import PremiumItinerariesList from "./pages/itineraries/PremiumItinerariesList";
 import CreateItinerary from "./pages/itineraries/CreateItinerary";
 import ManageItinerary from "./pages/itineraries/ManageItinerary";
+import WeatherAlerts from "./pages/weather/WeatherAlerts";
 import NotFound from "./pages/NotFound";
 import MainLayout from "./components/layout/MainLayout";
 
@@ -49,7 +50,7 @@ const App = () => (
             <Route path="/itineraries/:id" element={<ManageItinerary />} />
             <Route path="/equipment" element={<EquipmentList />} />
             <Route path="/training" element={<ComingSoon title="Training Programs" description="Create training plans and exercise sessions" />} />
-            <Route path="/weather" element={<ComingSoon title="Weather Alerts" description="Configure weather alert rules and monitoring" />} />
+            <Route path="/weather" element={<WeatherAlerts />} />
             <Route path="/users" element={<UsersManager />} />
             <Route path="/users/:userId" element={<UserProfile />} />
             <Route path="/reviews" element={<Reviews/>} />
