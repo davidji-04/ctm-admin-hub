@@ -80,11 +80,8 @@ const Header = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Definições de Perfil</DropdownMenuItem>
-            <DropdownMenuItem>Registo de Atividade</DropdownMenuItem>
-            <DropdownMenuSeparator />
+            <DropdownMenuItem>Perfil</DropdownMenuItem>
             <DropdownMenuItem onClick={handleLogout} className="text-destructive">
               <LogOut className="w-4 h-4 mr-2" />
               Terminar Sessão
