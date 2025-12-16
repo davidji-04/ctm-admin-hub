@@ -26,6 +26,7 @@ import WeatherAlerts from "./pages/weather/WeatherAlerts";
 import NotFound from "./pages/NotFound";
 import MainLayout from "./components/layout/MainLayout";
 import { TrainingManager } from "./pages/training/TrainingManager";
+import AdminProfile from "./pages/AdminProfile";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
             <Route path="/reviews" element={<Reviews/>} />
             <Route path="/reviews/:reviewId" element={<ReviewDetails />} />
             <Route path="/images" element={<ImageGallery />} />
+            <Route path="/profile" element={<AdminProfile />} />
             <Route path="/reports" element={<ComingSoon title="Reports & Analytics" description="Generate reports and view analytics" />} />
           </Route>
           <Route path="*" element={<NotFound />} />
