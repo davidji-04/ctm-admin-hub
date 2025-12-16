@@ -25,6 +25,7 @@ import ManageItinerary from "./pages/itineraries/ManageItinerary";
 import WeatherAlerts from "./pages/weather/WeatherAlerts";
 import NotFound from "./pages/NotFound";
 import MainLayout from "./components/layout/MainLayout";
+import { TrainingManager } from "./pages/training/TrainingManager";
 
 const queryClient = new QueryClient();
 
@@ -51,7 +52,7 @@ const App = () => (
             <Route path="/itineraries/create" element={<CreateItinerary />} />
             <Route path="/itineraries/:id" element={<ManageItinerary />} />
             <Route path="/equipment" element={<EquipmentList />} />
-            <Route path="/training" element={<ComingSoon title="Training Programs" description="Create training plans and exercise sessions" />} />
+            <Route path="/training" element={<TrainingManager />} />
             <Route path="/weather" element={<WeatherAlerts />} />
             <Route path="/users" element={<UsersManager />} />
             <Route path="/users/:userId" element={<UserProfile />} />

@@ -23,7 +23,7 @@ const navigationItems = [
   { name: "Serviços", href: "/services", icon: Briefcase },
   { name: "Roteiros", href: "/itineraries", icon: CalendarDays },
   { name: "Equipamentos", href: "/equipment", icon: Package },
-  { name: "Treino", href: "/training", icon: GraduationCap },
+  { name: "Planos de Treino", href: "/training", icon: GraduationCap },
   { name: "Alertas Meteo", href: "/weather", icon: CloudRain },
   { name: "Utilizadores", href: "/users", icon: Users },
   { name: "Avaliações", href: "/reviews", icon: Star },
