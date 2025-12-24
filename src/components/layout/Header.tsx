@@ -24,11 +24,10 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
 
   useEffect(() => {
     const userData = localStorage.getItem("ctm_user");
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
+    if (userData) setUser(JSON.parse(userData));
   }, []);
 
+  // Atalho para pesquisa global (Cmd/Ctrl + K)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -46,9 +45,9 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   };
 
   return (
-      <header className="h-16 border-b border-border bg-card px-6 flex items-center justify-between">
-        {/* ESQUERDA: botão sidebar + pesquisa */}
-        <div className="flex items-center gap-4 flex-1 max-w-xl">
+      <header className="h-16 border-b border-border bg-card px-4 sm:px-6 flex items-center justify-between">
+        {/* ESQUERDA: botão sidebar + search bar */}
+        <div className="flex items-center flex-1 min-w-0 gap-2">
           {/* BOTÃO PARA ABRIR/FECHAR SIDEBAR */}
           <button
               onClick={toggleSidebar}
@@ -58,24 +57,26 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             <Menu className="w-5 h-5" />
           </button>
 
-          {/* BOTÃO DE PESQUISA */}
-          <Button
-              variant="outline"
-              className="w-full justify-start text-muted-foreground"
-              onClick={() => setSearchOpen(true)}
-          >
-            <Search className="mr-2 h-4 w-4" />
-            Pesquisar percursos, localidades, utilizadores...
-            <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-              <span className="text-xs">⌘</span>K
-            </kbd>
-          </Button>
+          {/* SEARCH BAR RESPONSIVA */}
+          <div className="flex-1 min-w-0">
+            <Button
+                variant="outline"
+                className="w-full justify-start text-muted-foreground truncate"
+                onClick={() => setSearchOpen(true)}
+            >
+              <Search className="mr-2 h-4 w-4" />
+              Pesquisar percursos, localidades, utilizadores...
+              <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                <span className="text-xs">⌘</span>K
+              </kbd>
+            </Button>
+          </div>
         </div>
 
         <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
 
         {/* DIREITA: notificações + utilizador */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 ml-4">
           <NotificationCenter />
 
           <DropdownMenu>
