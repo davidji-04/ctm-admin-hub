@@ -68,7 +68,7 @@ const Sidebar = () => {
 
       <div className="p-4 border-t border-sidebar-border">
         <div className="text-xs text-sidebar-foreground/60">
-          <p>© 2024 CTM</p>
+          <p>© 2025 CTM</p>
           <p>Versão 1.0.0</p>
         </div>
       </div>
