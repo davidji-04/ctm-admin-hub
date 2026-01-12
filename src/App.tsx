@@ -27,6 +27,7 @@ import NotFound from "./pages/NotFound";
 import MainLayout from "./components/layout/MainLayout";
 import { TrainingManager } from "./pages/training/TrainingManager";
 import AdminProfile from "./pages/AdminProfile";
+import AnalyticsDashboard from "./pages/reports/AnalyticsDashboard";
 
 const queryClient = new QueryClient();
 
@@ -61,7 +62,7 @@ const App = () => (
             <Route path="/reviews/:reviewId" element={<ReviewDetails />} />
             <Route path="/images" element={<ImageGallery />} />
             <Route path="/profile" element={<AdminProfile />} />
-            <Route path="/reports" element={<ComingSoon title="Reports & Analytics" description="Generate reports and view analytics" />} />
+            <Route path="/reports" element={<AnalyticsDashboard />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
