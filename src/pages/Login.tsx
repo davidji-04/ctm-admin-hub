@@ -19,6 +19,28 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    // Development shortcut: always allow login and seed a mock session.
+    if (import.meta.env.DEV) {
+      const devUser = {
+        email: email || "dev@ctm.com",
+        role: "admin",
+        name: "Dev User",
+        id: "dev-user"
+      };
+
+      localStorage.setItem("token", "dev-token");
+      localStorage.setItem("ctm_user", JSON.stringify(devUser));
+
+      toast({
+        title: "Login de desenvolvimento",
+        description: `Acesso concedido${devUser.email ? ` para ${devUser.email}` : ""}.`,
+      });
+
+      navigate("/dashboard");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const loginResponse = await authService.login({ 
         identitier: email, 
