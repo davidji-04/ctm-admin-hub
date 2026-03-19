@@ -14,34 +14,10 @@ import { ImageCard } from '@/components/images/ImageCard';
 import { ImageUploadModal } from '@/components/images/ImageUploadModal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { mockRoutes } from '@/data/mockRoutes';
+import { mockRouteImages, mockRoutes } from '@/data/mockRoutes';
 
 const ImageGallery = () => {
-  const [images, setImages] = useState<RouteImage[]>([
-    {
-      id: '1',
-      percurso_id: '1',
-      tipo: 'hero',
-      url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4',
-      filename: 'hero-caminho-portugues.jpg',
-      width: 1920,
-      height: 1080,
-      size: 2048576,
-      uploadedAt: '2024-01-15T10:00:00Z',
-    },
-    {
-      id: '2',
-      percurso_id: '1',
-      tipo: 'galeria',
-      url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b',
-      filename: 'gallery-1.jpg',
-      ordem: 1,
-      width: 1600,
-      height: 900,
-      size: 1524576,
-      uploadedAt: '2024-01-15T11:00:00Z',
-    },
-  ]);
+  const [images, setImages] = useState<RouteImage[]>(mockRouteImages);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [routeFilter, setRouteFilter] = useState<string>('all');

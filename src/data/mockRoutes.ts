@@ -1,3 +1,5 @@
+import { RouteImage } from '@/types/image';
+
 export interface AppRoute {
   id: number;
   title: string;
@@ -71,5 +73,36 @@ export const mockRoutes: AppRoute[] = [
     modality: "bike",
     lastUpdated: "2023-12-20",
     startCoordinates: [37.1893, -7.4428],
+  },
+];
+
+const getRouteIdByTitle = (title: string): string => {
+  const route = mockRoutes.find((item) => item.title === title);
+  return route ? route.id.toString() : mockRoutes[0]?.id.toString() ?? '1';
+};
+
+export const mockRouteImages: RouteImage[] = [
+  {
+    id: '1',
+    percurso_id: getRouteIdByTitle('Caminho Portugues'),
+    tipo: 'hero',
+    url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4',
+    filename: 'hero-caminho-portugues.jpg',
+    width: 1920,
+    height: 1080,
+    size: 2048576,
+    uploadedAt: '2024-01-15T10:00:00Z',
+  },
+  {
+    id: '2',
+    percurso_id: getRouteIdByTitle('Caminho Portugues'),
+    tipo: 'galeria',
+    url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b',
+    filename: 'gallery-1.jpg',
+    ordem: 1,
+    width: 1600,
+    height: 900,
+    size: 1524576,
+    uploadedAt: '2024-01-15T11:00:00Z',
   },
 ];
