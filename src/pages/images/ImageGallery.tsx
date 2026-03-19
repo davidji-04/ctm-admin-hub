@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search, Upload } from 'lucide-react';
+import { Search, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -13,12 +13,14 @@ import { RouteImage, ImageType } from '@/types/image';
 import { ImageCard } from '@/components/images/ImageCard';
 import { ImageUploadModal } from '@/components/images/ImageUploadModal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { mockRoutes } from '@/data/mockRoutes';
 
 const ImageGallery = () => {
   const [images, setImages] = useState<RouteImage[]>([
     {
       id: '1',
-      percurso_id: 'route-1',
+      percurso_id: '1',
       tipo: 'hero',
       url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4',
       filename: 'hero-caminho-portugues.jpg',
@@ -29,7 +31,7 @@ const ImageGallery = () => {
     },
     {
       id: '2',
-      percurso_id: 'route-1',
+      percurso_id: '1',
       tipo: 'galeria',
       url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b',
       filename: 'gallery-1.jpg',
@@ -45,12 +47,6 @@ const ImageGallery = () => {
   const [routeFilter, setRouteFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<ImageType | 'all'>('all');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-
-  // Mock routes for filter
-  const mockRoutes = [
-    { id: 'route-1', name: 'Caminho Português' },
-    { id: 'route-2', name: 'Rota da Montanha' },
-  ];
 
   const handleImageUpload = (imageData: Omit<RouteImage, 'id' | 'uploadedAt'>) => {
     const newImage: RouteImage = {
@@ -84,6 +80,25 @@ const ImageGallery = () => {
     .filter((img) => img.tipo === 'galeria')
     .sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
 
+  const routeSections = mockRoutes.map((route) => {
+    const routeId = route.id.toString();
+    const routeImages = filteredImages.filter((img) => img.percurso_id === routeId);
+    const routeHeroImages = routeImages.filter((img) => img.tipo === 'hero');
+    const routeGalleryImages = routeImages
+      .filter((img) => img.tipo === 'galeria')
+      .sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
+
+    return {
+      route,
+      routeId,
+      routeImages,
+      routeHeroImages,
+      routeGalleryImages,
+    };
+  });
+
+  const totalRouteSectionImages = routeSections.reduce((acc, section) => acc + section.routeImages.length, 0);
+
   return (
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -116,8 +131,8 @@ const ImageGallery = () => {
           <SelectContent>
             <SelectItem value="all">Todos os percursos</SelectItem>
             {mockRoutes.map((route) => (
-              <SelectItem key={route.id} value={route.id}>
-                {route.name}
+              <SelectItem key={route.id} value={route.id.toString()}>
+                {route.title}
               </SelectItem>
             ))}
           </SelectContent>
@@ -139,6 +154,7 @@ const ImageGallery = () => {
           <TabsTrigger value="all">Todas ({filteredImages.length})</TabsTrigger>
           <TabsTrigger value="hero">Hero ({heroImages.length})</TabsTrigger>
           <TabsTrigger value="galeria">Galeria ({galleryImages.length})</TabsTrigger>
+          <TabsTrigger value="percurso">Percursos ({totalRouteSectionImages})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="mt-6">
@@ -179,6 +195,39 @@ const ImageGallery = () => {
             ))}
           </div>
         </TabsContent>
+
+        <TabsContent value="percurso" className="mt-6">
+          <Accordion type="multiple" className="w-full">
+            {routeSections.map((section) => (
+              <AccordionItem key={section.route.id} value={`route-${section.route.id}`}>
+                <AccordionTrigger>
+                  <div className="flex w-full items-center justify-between pr-4 text-left">
+                    <span className="font-medium">{section.route.title}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {section.routeImages.length} imagem(ns) • Hero {section.routeHeroImages.length} • Galeria {section.routeGalleryImages.length}
+                    </span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  {section.routeImages.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">Sem imagens para este percurso.</p>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                      {section.routeImages.map((image) => (
+                        <ImageCard
+                          key={image.id}
+                          image={image}
+                          onDelete={handleImageDelete}
+                          onOrderChange={handleOrderChange}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </TabsContent>
       </Tabs>
 
       {filteredImages.length === 0 && (
@@ -191,7 +240,10 @@ const ImageGallery = () => {
         open={isUploadModalOpen}
         onOpenChange={setIsUploadModalOpen}
         onUpload={handleImageUpload}
-        routes={mockRoutes}
+        routes={mockRoutes.map((route) => ({
+          id: route.id.toString(),
+          name: route.title,
+        }))}
       />
     </div>
   );
