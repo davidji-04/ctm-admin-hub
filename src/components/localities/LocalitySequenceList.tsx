@@ -74,7 +74,7 @@ const SortableLocalityItem = ({
             >
               <GripVertical className="w-5 h-5 text-muted-foreground" />
             </div>
-            
+
             <div className="flex-1 space-y-3">
               <div className="flex items-start justify-between">
                 <div className="flex items-baseline gap-2">
@@ -109,23 +109,12 @@ const SortableLocalityItem = ({
               )}
 
               <div className="flex items-center gap-2 pt-2 border-t">
-                <Button variant="outline" size="sm" onClick={() => onEdit(locality)}>
-                  <Edit className="w-3 h-3 mr-1" />
-                  Editar
-                </Button>
+
                 <Button variant="outline" size="sm" onClick={handleViewServices}>
                   <ExternalLink className="w-3 h-3 mr-1" />
                   Ver Serviços
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onDelete(locality)}
-                  className="ml-auto text-destructive hover:text-destructive"
-                >
-                  <Trash2 className="w-3 h-3 mr-1" />
-                  Excluir
-                </Button>
+
               </div>
             </div>
           </div>

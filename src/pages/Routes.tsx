@@ -30,6 +30,7 @@ import { useNavigate } from "react-router-dom";
 import { DuplicateRouteModal } from "@/components/routes/DuplicateRouteModal";
 import { DeleteRouteModal } from "@/components/routes/DeleteRouteModal";
 import RoutesMap from "@/components/routes/RoutesMap";
+import { SHARED_MOCK_ROUTES } from '@/data/mockData';
 
 // Mock user role
 const getUserRole = (): "admin" | "editor" => "admin";
@@ -44,75 +45,12 @@ const Routes = () => {
   const [duplicateTarget, setDuplicateTarget] = useState<{ id: string; title: string } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string; itineraries: number } | null>(null);
 
-  // Mock routes - only routes that have localities defined
-  // Routes without localities are in the Localities module work queue
-  const mockRoutes = [
-    {
-      id: 1,
-      title: "Caminho Português",
-      country: "Portugal",
-      status: "active",
-      category: "premium",
-      distance: "245 km",
-      localities: 12,
-      modality: "walking",
-      lastUpdated: "2024-01-15",
-      startCoordinates: [41.1579, -8.6291] as [number, number],
-    },
-    {
-      id: 2,
-      title: "Via Algarviana",
-      country: "Portugal",
-      status: "draft",
-      category: "free",
-      distance: "187 km",
-      localities: 8,
-      modality: "bike",
-      lastUpdated: "2024-01-14",
-      startCoordinates: [37.2985, -7.9304] as [number, number],
-    },
-    {
-      id: 3,
-      title: "Rota Vicentina",
-      country: "Portugal",
-      status: "active",
-      category: "premium",
-      distance: "320 km",
-      localities: 15,
-      modality: "walking",
-      lastUpdated: "2024-01-12",
-      startCoordinates: [37.9577, -8.7853] as [number, number],
-    },
-    {
-      id: 4,
-      title: "Caminho de Santiago - Costa",
-      country: "Portugal",
-      status: "active",
-      category: "free",
-      distance: "280 km",
-      localities: 18,
-      modality: "walking",
-      lastUpdated: "2024-01-10",
-      startCoordinates: [41.6901, -8.8344] as [number, number],
-    },
-    {
-      id: 5,
-      title: "Grande Rota do Guadiana",
-      country: "Portugal",
-      status: "inactive",
-      category: "free",
-      distance: "65 km",
-      localities: 6,
-      modality: "bike",
-      lastUpdated: "2023-12-20",
-      startCoordinates: [37.1893, -7.4428] as [number, number],
-    },
-  ];
+
 
   // Apply filters
-  const filteredRoutes = mockRoutes.filter((route) => {
+  const filteredRoutes = SHARED_MOCK_ROUTES.filter((route) => {
     const matchesSearch = route.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         route.country.toLowerCase().includes(searchQuery.toLowerCase());
+      route.country.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "all" || route.status === statusFilter;
     const matchesCategory = categoryFilter === "all" || route.category === categoryFilter;
     const matchesModality = modalityFilter === "all" || route.modality === modalityFilter;

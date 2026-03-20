@@ -26,6 +26,7 @@ interface LocalityEditorProps {
   routeName: string;
   localities: Locality[];
   totalDistance: number;
+  gpxUrl?: string; // NOVO: Prop para receber o URL ou caminho do ficheiro GPX do percurso
   onLocalitiesChange: (localities: Locality[]) => void;
 }
 
@@ -34,6 +35,7 @@ export const LocalityEditor = ({
   routeName,
   localities,
   totalDistance,
+  gpxUrl, // Extraído das props
   onLocalitiesChange,
 }: LocalityEditorProps) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -65,13 +67,13 @@ export const LocalityEditor = ({
     const updatedLocalities = localities.map((loc) =>
       loc.id === editingLocality.id
         ? {
-            ...localityData,
-            id: loc.id,
-            percurso_id: loc.percurso_id,
-            ordem_no_percurso: loc.ordem_no_percurso,
-            distancia_localidade_anterior: loc.distancia_localidade_anterior,
-            tempo_estimado_da_anterior: loc.tempo_estimado_da_anterior,
-          }
+          ...localityData,
+          id: loc.id,
+          percurso_id: loc.percurso_id,
+          ordem_no_percurso: loc.ordem_no_percurso,
+          distancia_localidade_anterior: loc.distancia_localidade_anterior,
+          tempo_estimado_da_anterior: loc.tempo_estimado_da_anterior,
+        }
         : loc
     );
 
@@ -147,27 +149,25 @@ export const LocalityEditor = ({
         </div>
       </div>
 
-      {/* Main Controls */}
-      <div className="p-4 border-b flex gap-2">
-        <Button onClick={() => setIsAddModalOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Adicionar Localidade
-        </Button>
-        <Button variant="outline" onClick={() => setIsGPXModalOpen(true)}>
-          <Upload className="w-4 h-4 mr-2" />
-          Importar de GPX
-        </Button>
-      </div>
-
       {/* Content Area */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 overflow-hidden">
-        {/* Sequential Locality List */}
-        <div className="h-full overflow-y-auto">
+        {/* Lado Esquerdo: Sequential Locality List */}
+        <div className="h-full overflow-y-auto pr-2">
           <LocalitySequenceList
             localities={localities}
             onEdit={setEditingLocality}
             onDelete={setDeletingLocality}
             onReorder={handleDragEnd}
+          />
+        </div>
+
+        {/* Lado Direito: Map Area (NOVO) */}
+        <div className="h-full rounded-xl overflow-hidden border bg-muted/10 relative min-h-[400px]">
+          <LocalityMap
+            localities={localities} // Passa os waypoints para renderizar os marcadores
+            gpxUrl={gpxUrl}         // Passa a track do GPX dinâmico vindo da base de dados/pai
+            selectedLocalityId={selectedLocalityId}
+            onLocalitySelect={setSelectedLocalityId}
           />
         </div>
       </div>
