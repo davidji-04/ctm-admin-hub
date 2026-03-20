@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Edit, MapPin, Mountain, Clock } from 'lucide-react';
 import { LocalityMap } from '@/components/localities/LocalityMap';
 import { Locality } from '@/types/locality';
+import { RouteImage } from '@/types/image';
+import { mockRouteImages, mockRoutes } from '@/data/mockRoutes';
 
 interface RouteDetails {
   id: string;
@@ -29,6 +31,7 @@ export const RouteDetails = () => {
   const { routeId } = useParams<{ routeId: string }>();
   const navigate = useNavigate();
   const [route, setRoute] = useState<RouteDetails | null>(null);
+  const [routeImages, setRouteImages] = useState<RouteImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -41,24 +44,41 @@ export const RouteDetails = () => {
       // Mock API call
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      // Mock data
+      const selectedRoute = mockRoutes.find((item) => item.id.toString() === routeId);
+
+      if (!selectedRoute) {
+        setRoute(null);
+        setRouteImages([]);
+        return;
+      }
+
       const mockRoute: RouteDetails = {
-        id: routeId || '',
-        title: 'Caminho Português',
-        localidade_pais: 'PT',
-        categoria: 'premium',
-        modalidade: ['a_pe'],
+        id: selectedRoute.id.toString(),
+        title: selectedRoute.title,
+        localidade_pais: selectedRoute.country,
+        categoria: selectedRoute.category,
+        modalidade: selectedRoute.modality === 'bike' ? ['bicicleta'] : ['a_pe'],
         dificuldade_geral: 'media',
-        status: 'ativo',
-        distancia_total: 245.5,
-        elevacao_altimetria: 2340,
+        status:
+          selectedRoute.status === 'active'
+            ? 'ativo'
+            : selectedRoute.status === 'draft'
+              ? 'rascunho'
+              : 'inativo',
+        distancia_total: Number.parseFloat(selectedRoute.distance.replace(' km', '')) || 0,
+        elevacao_altimetria: undefined,
         tipo_terreno: 'mixed',
-        descricao: 'Historic pilgrimage route through Portugal...',
-        version: 3,
+        descricao: `Detalhes do percurso ${selectedRoute.title}.`,
+        version: 1,
         localities: [],
       };
 
+      const selectedRouteImages = mockRouteImages
+        .filter((image) => image.percurso_id === selectedRoute.id.toString())
+        .sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
+
       setRoute(mockRoute);
+      setRouteImages(selectedRouteImages);
     } catch (error) {
       console.error('Failed to load route:', error);
     } finally {
@@ -113,6 +133,9 @@ export const RouteDetails = () => {
         return difficulty;
     }
   };
+
+  const heroImages = routeImages.filter((image) => image.tipo === 'hero');
+  const galleryImages = routeImages.filter((image) => image.tipo === 'galeria');
 
   return (
     <div className="space-y-6">
@@ -261,9 +284,50 @@ export const RouteDetails = () => {
             <CardHeader>
               <CardTitle>Route Media</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
-                Hero image and gallery will be displayed here
+            <CardContent className="space-y-6">
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                  Hero ({heroImages.length})
+                </h3>
+                {heroImages.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Sem imagem hero para este percurso.</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {heroImages.map((image) => (
+                      <div key={image.id} className="space-y-2">
+                        <div className="aspect-video overflow-hidden rounded-md border bg-muted">
+                          <img src={image.url} alt={image.filename} className="h-full w-full object-cover" />
+                        </div>
+                        <p className="text-sm font-medium truncate">{image.filename}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                  Galeria ({galleryImages.length})
+                </h3>
+                {galleryImages.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Sem imagens de galeria para este percurso.</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {galleryImages.map((image) => (
+                      <div key={image.id} className="space-y-2">
+                        <div className="aspect-video overflow-hidden rounded-md border bg-muted">
+                          <img src={image.url} alt={image.filename} className="h-full w-full object-cover" />
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-sm font-medium truncate">{image.filename}</p>
+                          {typeof image.ordem === 'number' && (
+                            <Badge variant="secondary">#{image.ordem}</Badge>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

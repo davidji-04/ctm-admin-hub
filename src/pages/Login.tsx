@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Leaf } from "lucide-react";
+import { authService } from "@/components/services/authService";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -18,31 +19,71 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulated authentication - replace with actual API call
-    setTimeout(() => {
-      if (email && password) {
-        // Store mock user data
-        localStorage.setItem("ctm_user", JSON.stringify({
-          email,
-          role: email.includes("admin") ? "admin" : "editor",
-          name: email.split("@")[0],
-        }));
-        
-        toast({
-          title: "Login bem-sucedido",
-          description: "Bem-vindo ao Painel de Administração CTM",
-        });
-        
-        navigate("/dashboard");
-      } else {
-        toast({
-          title: "Login falhou",
-          description: "Por favor, insira credenciais válidas",
-          variant: "destructive",
-        });
-      }
+    // Development shortcut: always allow login and seed a mock session.
+    if (import.meta.env.DEV) {
+      const devUser = {
+        email: email || "dev@ctm.com",
+        role: "admin",
+        name: "Dev User",
+        id: "dev-user"
+      };
+
+      localStorage.setItem("token", "dev-token");
+      localStorage.setItem("ctm_user", JSON.stringify(devUser));
+
+      toast({
+        title: "Login de desenvolvimento",
+        description: `Acesso concedido${devUser.email ? ` para ${devUser.email}` : ""}.`,
+      });
+
+      navigate("/dashboard");
       setIsLoading(false);
-    }, 1000);
+      return;
+    }
+
+    try {
+      const loginResponse = await authService.login({ 
+        identitier: email, 
+        password: password 
+      });
+
+      const token = loginResponse?.token || loginResponse; 
+      localStorage.setItem("token", token);
+
+      let user = null;
+      try {
+        user = await authService.getCurrentUser();
+        
+        localStorage.setItem("ctm_user", JSON.stringify({
+          email: user.email,
+          role: user.role || "admin",
+          name: user.userName,
+          id: user.id
+        }));
+      } catch (userError) {
+        console.warn("Could not fetch user details immediately", userError);
+      }
+
+      toast({
+        title: "Login bem-sucedido",
+        description: `Bem-vindo de volta${user ? ", " + user.userName : ""}!`,
+      });
+
+      navigate("/dashboard");
+
+    } catch (error: any) {
+      console.error("Login Error:", error);
+      
+      const errorMessage = error.response?.data?.message || "Verifique as suas credenciais e tente novamente.";
+      
+      toast({
+        title: "Erro ao entrar",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -89,9 +130,6 @@ const Login = () => {
               {isLoading ? "A entrar..." : "Entrar"}
             </Button>
           </form>
-          <div className="mt-4 text-center text-sm text-muted-foreground">
-            <p>Demo: Use qualquer email com "admin" para papel de administrador</p>
-          </div>
         </CardContent>
       </Card>
     </div>
