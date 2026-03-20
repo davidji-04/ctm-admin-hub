@@ -24,10 +24,6 @@ interface WizardData {
     desafios_esperados?: string;
     certificacoes?: string;
     relatos_equipe?: string;
-  };
-  step4?: {
-    heroImage: { id: string; url: string } | null;
-    gallery: Array<{ id: string; url: string }>;
     gpxFile?: {
       id: string;
       url: string;
@@ -38,6 +34,19 @@ interface WizardData {
         elevation?: number;
       };
     } | null;
+  };
+  step4?: {
+    descricao: string;
+    historia_percurso?: string;
+    destaques_unicos?: string;
+    experiencia_cultural?: string;
+    desafios_esperados?: string;
+    certificacoes?: string;
+    relatos_equipe?: string;
+  };
+  step5?: {
+    heroImage: { id: string; url: string } | null;
+    gallery: Array<{ id: string; url: string }>;
   };
 }
 

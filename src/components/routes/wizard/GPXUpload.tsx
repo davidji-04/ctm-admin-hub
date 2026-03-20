@@ -5,6 +5,7 @@ import { X, Upload, FileText, Eye, MapPin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { GpxMap } from "./GpxMap";
 
 interface GPXFile {
   id?: string;
@@ -22,7 +23,7 @@ interface GPXUploadProps {
   onChange: (file: GPXFile | null) => void;
 }
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export const GPXUpload = ({ value, onChange }: GPXUploadProps) => {
   const { toast } = useToast();
@@ -37,35 +38,20 @@ export const GPXUpload = ({ value, onChange }: GPXUploadProps) => {
           const content = e.target?.result as string;
           const parser = new DOMParser();
           const xmlDoc = parser.parseFromString(content, "text/xml");
-
-          // Check for GPX root element
           const gpxElement = xmlDoc.getElementsByTagName("gpx")[0];
           if (!gpxElement) {
-            toast({
-              title: "Invalid GPX file",
-              description: "File does not contain valid GPX data",
-              variant: "destructive",
-            });
+            toast({ title: "Invalid GPX file", description: "File does not contain valid GPX data", variant: "destructive" });
             resolve(false);
             return;
           }
-
           resolve(true);
-        } catch (error) {
-          toast({
-            title: "Invalid GPX file",
-            description: "Failed to parse GPX file",
-            variant: "destructive",
-          });
+        } catch {
+          toast({ title: "Invalid GPX file", description: "Failed to parse GPX file", variant: "destructive" });
           resolve(false);
         }
       };
       reader.onerror = () => {
-        toast({
-          title: "Error reading file",
-          description: "Could not read the GPX file",
-          variant: "destructive",
-        });
+        toast({ title: "Error reading file", description: "Could not read the GPX file", variant: "destructive" });
         resolve(false);
       };
       reader.readAsText(file);
@@ -80,19 +66,14 @@ export const GPXUpload = ({ value, onChange }: GPXUploadProps) => {
           const content = e.target?.result as string;
           const parser = new DOMParser();
           const xmlDoc = parser.parseFromString(content, "text/xml");
-
           const waypoints = xmlDoc.getElementsByTagName("wpt").length;
           const trackPoints = xmlDoc.getElementsByTagName("trkpt").length;
-
-          // Mock distance and elevation for demo
-          const metadata = {
+          resolve({
             waypoints: waypoints || trackPoints,
-            distance: 125.5, // km (in real app, calculate from coordinates)
-            elevation: 2340, // m (in real app, extract from GPX)
-          };
-
-          resolve(metadata);
-        } catch (error) {
+            distance: 125.5,
+            elevation: 2340,
+          });
+        } catch {
           resolve({ waypoints: 0 });
         }
       };
@@ -103,49 +84,24 @@ export const GPXUpload = ({ value, onChange }: GPXUploadProps) => {
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       if (acceptedFiles.length === 0) return;
-
       const file = acceptedFiles[0];
 
-      // Validate file size
       if (file.size > MAX_FILE_SIZE) {
-        toast({
-          title: "File too large",
-          description: `Maximum file size is 10MB. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB`,
-          variant: "destructive",
-        });
+        toast({ title: "File too large", description: `Max 10MB. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB`, variant: "destructive" });
         return;
       }
 
-      // Validate GPX format
       const isValid = await validateGPXFile(file);
       if (!isValid) return;
 
       setIsUploading(true);
-
       try {
-        // Extract metadata
         const metadata = await extractGPXMetadata(file);
-
-        // Mock upload - in production this would upload to real backend
         await new Promise((resolve) => setTimeout(resolve, 600));
-
-        onChange({
-          id: `gpx-${Date.now()}`,
-          url: URL.createObjectURL(file),
-          name: file.name,
-          metadata,
-        });
-
-        toast({
-          title: "GPX file uploaded",
-          description: "Your GPX file has been uploaded successfully",
-        });
-      } catch (error) {
-        toast({
-          title: "Upload failed",
-          description: "Failed to upload GPX file. Please try again.",
-          variant: "destructive",
-        });
+        onChange({ id: `gpx-${Date.now()}`, url: URL.createObjectURL(file), name: file.name, metadata });
+        toast({ title: "GPX file uploaded", description: "Your GPX file has been uploaded successfully" });
+      } catch {
+        toast({ title: "Upload failed", description: "Failed to upload GPX file. Please try again.", variant: "destructive" });
       } finally {
         setIsUploading(false);
       }
@@ -155,32 +111,26 @@ export const GPXUpload = ({ value, onChange }: GPXUploadProps) => {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      "application/gpx+xml": [".gpx"],
-      "text/xml": [".gpx"],
-      "application/xml": [".gpx"],
-    },
+    accept: { "application/gpx+xml": [".gpx"], "text/xml": [".gpx"], "application/xml": [".gpx"] },
     maxFiles: 1,
     disabled: isUploading,
   });
 
-  const handleRemove = () => {
-    onChange(null);
-  };
-
   if (value?.id && value?.url) {
     return (
       <>
+        {/* ── File card ─────────────────────────────────────────────── */}
         <div className="space-y-2">
           <label className="text-sm font-medium">GPX File (Optional)</label>
-          <div className="border rounded-lg p-4 bg-card">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-start gap-3 flex-1">
-                <div className="rounded-lg bg-primary/10 p-2">
+          <div className="border rounded-lg p-4 bg-card space-y-3">
+            {/* Top row: icon + name + remove */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3 flex-1 min-w-0">
+                <div className="rounded-lg bg-primary/10 p-2 shrink-0">
                   <FileText className="h-5 w-5 text-primary" />
                 </div>
-                <div className="space-y-1 flex-1">
-                  <p className="text-sm font-medium">{value.name}</p>
+                <div className="space-y-1.5 min-w-0">
+                  <p className="text-sm font-medium truncate">{value.name}</p>
                   <div className="flex flex-wrap gap-2">
                     {value.metadata?.waypoints && (
                       <Badge variant="secondary" className="text-xs">
@@ -201,47 +151,52 @@ export const GPXUpload = ({ value, onChange }: GPXUploadProps) => {
                   </div>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowPreview(true)}
-                >
-                  <Eye className="h-4 w-4 mr-1" />
-                  Preview
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleRemove}
-                  className="text-destructive hover:text-destructive"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
+              {/* Remove button — top-right */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => onChange(null)}
+                className="text-destructive hover:text-destructive shrink-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
+
+            {/* Preview button — full width, below the info */}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={() => setShowPreview(true)}
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              Preview Route
+            </Button>
           </div>
         </div>
 
+        {/* ── Preview dialog ──────────────────────────────────────────── */}
         <Dialog open={showPreview} onOpenChange={setShowPreview}>
           <DialogContent className="max-w-3xl">
             <DialogHeader>
               <DialogTitle>GPX Preview</DialogTitle>
             </DialogHeader>
+
             <div className="grid md:grid-cols-2 gap-6">
+              {/* Left: file info */}
               <div className="space-y-4">
                 <div>
                   <h4 className="text-sm font-medium mb-2">File Information</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Filename:</span>
-                      <span className="font-medium">{value.name}</span>
+                      <span className="font-medium truncate max-w-[180px]">{value.name}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Waypoints:</span>
-                      <span className="font-medium">{value.metadata?.waypoints || 0}</span>
+                      <span className="font-medium">{value.metadata?.waypoints ?? 0}</span>
                     </div>
                     {value.metadata?.distance && (
                       <div className="flex justify-between">
@@ -257,22 +212,10 @@ export const GPXUpload = ({ value, onChange }: GPXUploadProps) => {
                     )}
                   </div>
                 </div>
-                <div className="p-4 bg-muted/50 rounded-lg border">
-                  <p className="text-sm text-muted-foreground">
-                    Full route visualization and locality extraction will be available in the
-                    Localities Management module.
-                  </p>
-                </div>
               </div>
-              <div className="bg-muted/30 rounded-lg border h-64 flex items-center justify-center">
-                <div className="text-center space-y-2">
-                  <MapPin className="h-8 w-8 text-muted-foreground mx-auto" />
-                  <p className="text-sm text-muted-foreground">Map preview</p>
-                  <p className="text-xs text-muted-foreground">
-                    Route visualization coming soon
-                  </p>
-                </div>
-              </div>
+
+              {/* Right: real map — replaces the old placeholder */}
+              <GpxMap gpxUrl={value.url} height={280} />
             </div>
           </DialogContent>
         </Dialog>
@@ -280,6 +223,7 @@ export const GPXUpload = ({ value, onChange }: GPXUploadProps) => {
     );
   }
 
+  // ── Drop zone (no file yet) ──────────────────────────────────────────────
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium">GPX File (Optional)</label>
@@ -289,9 +233,7 @@ export const GPXUpload = ({ value, onChange }: GPXUploadProps) => {
       <div
         {...getRootProps()}
         className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-          isDragActive
-            ? "border-primary bg-primary/5"
-            : "border-border hover:border-primary/50"
+          isDragActive ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
         } ${isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
       >
         <input {...getInputProps()} />

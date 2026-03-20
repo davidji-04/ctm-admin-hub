@@ -71,7 +71,7 @@ const sanitizeHTML = (html: string): string => {
   });
 };
 
-export const Step3EditorialContent = () => {
+export const Step4EditorialContent = () => {
   const { wizardData, updateWizardData, setCurrentStep } = useWizard();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -80,7 +80,7 @@ export const Step3EditorialContent = () => {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: wizardData.step3 || {
+    defaultValues: wizardData.step4 || {
       descricao: "",
       historia_percurso: "",
       destaques_unicos: "",
@@ -109,7 +109,7 @@ export const Step3EditorialContent = () => {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
       // Store step data
-      updateWizardData("step3", sanitizedData);
+      updateWizardData("step4", sanitizedData);
 
       toast({
         title: "Success",
@@ -121,7 +121,7 @@ export const Step3EditorialContent = () => {
 
       // Admin can continue to next step
       if (userRole === "admin") {
-        setCurrentStep(4);
+        setCurrentStep(5);
       }
     } catch (error) {
       toast({
@@ -135,7 +135,7 @@ export const Step3EditorialContent = () => {
   };
 
   const handleBack = () => {
-    setCurrentStep(2);
+    setCurrentStep(3);
   };
 
   return (
