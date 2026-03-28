@@ -66,12 +66,17 @@ export const EquipmentCard = ({ equipment, onEdit, onDelete }: EquipmentCardProp
           <div className="pt-2 border-t space-y-2">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Link2 className="w-3 h-3" />
-              <span>Vinculado a {equipment.linkedRoutes.length} percurso{equipment.linkedRoutes.length !== 1 ? 's' : ''}</span>
+              <span>Vinculado a {equipment.linkedRoutes.length} percurso(s)/roteiro(s)</span>
             </div>
             <div className="space-y-1">
               {equipment.linkedRoutes.slice(0, 2).map((link) => (
-                <div key={link.routeId} className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground truncate">{link.routeName}</span>
+                <div key={link.routeId} className="flex items-center justify-between gap-2 text-xs">
+                  <div className="min-w-0">
+                    <span className="text-muted-foreground truncate block">{link.routeName}</span>
+                    {link.routeType === 'roteiro' && link.clientName && (
+                      <span className="text-[11px] text-muted-foreground">Cliente: {link.clientName}</span>
+                    )}
+                  </div>
                   <Badge variant="outline" className={getPriorityColor(link.priority)}>
                     {EQUIPMENT_PRIORITY_LABELS[link.priority]}
                   </Badge>

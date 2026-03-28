@@ -20,19 +20,16 @@ import { ExerciseLibrary } from "@/components/training/ExerciseLibrary";
 import { ExercisePicker } from "@/components/training/ExercisePicker";
 import { DeletePlanModal } from "@/components/training/DeletePlanModal";
 import { TrainingPlan, TrainingSession, Exercise } from "@/types/training";
+import { SHARED_MOCK_CLIENTS, SHARED_MOCK_ROUTE_OPTIONS, SharedMockRouteOption } from "@/data/mockData";
 
 // --- MOCK DATA START ---
-const MOCK_ROUTES = [
-  { id: '1', name: 'Caminho Português', distance: '245 km', est_time: '12 dias' },
-  { id: '2', name: 'Rota Vicentina', distance: '320 km', est_time: '15 dias' },
-  { id: '3', name: 'Via Algarviana', distance: '300 km', est_time: '14 dias' }
-];
+const MOCK_ROUTES = SHARED_MOCK_ROUTE_OPTIONS;
+const MOCK_USERS = SHARED_MOCK_CLIENTS;
 
-const MOCK_USERS = [
-  { id: 'u1', name: 'João Silva' },
-  { id: 'u2', name: 'Maria Santos' },
-  { id: 'u3', name: 'Pedro Costa' }
-];
+const getRouteClient = (route: SharedMockRouteOption) => {
+  if (route.type !== 'roteiro' || !route.clientId) return undefined;
+  return MOCK_USERS.find((u) => u.id === route.clientId);
+};
 
 const INITIAL_EXERCISES: Exercise[] = [
   { id: '1', title: 'Alongamento de Perna', description: 'Essencial para caminhadas.', difficulty: 'facil', duration_minutes: 5 },
@@ -147,7 +144,13 @@ export const TrainingManager = () => {
   };
 
   const handleFinishWizard = () => {
-    if (!currentPlan.name) return;
+    if (!currentPlan.name || !currentPlan.route_id) return;
+
+    const selectedRoute = MOCK_ROUTES.find((r) => r.id === currentPlan.route_id);
+    if (selectedRoute?.type === 'roteiro' && !currentPlan.user_id) {
+      alert('Roteiros devem estar associados a um cliente antes de finalizar.');
+      return;
+    }
 
     if (isEditing && currentPlan.id) {
       // Update Existing
@@ -355,18 +358,58 @@ export const TrainingManager = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Roteiro</Label>
-                    <Select value={currentPlan.route_id} onValueChange={(v) => setCurrentPlan({ ...currentPlan, route_id: v })}>
+                    <Label>Percurso / Roteiro</Label>
+                    <Select
+                      value={currentPlan.route_id}
+                      onValueChange={(v) => {
+                        const selectedRoute = MOCK_ROUTES.find((r) => r.id === v);
+                        if (!selectedRoute) return;
+
+                        if (selectedRoute.type === 'roteiro') {
+                          const linkedClient = getRouteClient(selectedRoute);
+                          setCurrentPlan({
+                            ...currentPlan,
+                            route_id: v,
+                            user_id: linkedClient?.id,
+                          });
+                          return;
+                        }
+
+                        setCurrentPlan({ ...currentPlan, route_id: v });
+                      }}
+                    >
                       <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>{MOCK_ROUTES.map(r => <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>)}</SelectContent>
+                      <SelectContent>
+                        {MOCK_ROUTES.map((r) => {
+                          const linkedClient = getRouteClient(r);
+                          const routeLabel = r.type === 'roteiro' && linkedClient
+                            ? `${r.name} (Roteiro - ${linkedClient.name})`
+                            : `${r.name} (${r.type === 'roteiro' ? 'Roteiro' : 'Percurso'})`;
+
+                          return (
+                            <SelectItem key={r.id} value={r.id}>
+                              {routeLabel}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
                     <Label>Cliente</Label>
-                    <Select value={currentPlan.user_id} onValueChange={(v) => setCurrentPlan({ ...currentPlan, user_id: v })}>
+                    <Select
+                      value={currentPlan.user_id}
+                      onValueChange={(v) => setCurrentPlan({ ...currentPlan, user_id: v })}
+                      disabled={MOCK_ROUTES.find((r) => r.id === currentPlan.route_id)?.type === 'roteiro'}
+                    >
                       <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                       <SelectContent>{MOCK_USERS.map(u => <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>)}</SelectContent>
                     </Select>
+                    {MOCK_ROUTES.find((r) => r.id === currentPlan.route_id)?.type === 'roteiro' && (
+                      <p className="text-xs text-muted-foreground">
+                        Cliente associado automaticamente por ser um roteiro.
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
