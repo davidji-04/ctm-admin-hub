@@ -14,23 +14,25 @@ import {
 } from "@/components/ui/table";
 import { Download, Users, Crown, UserX, UserCheck } from "lucide-react";
 import { toast } from "sonner";
-import { usersAnalyticsData, UserAnalytics } from "@/data/analyticsMockData";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
+
+// Importa os dados diretamente do teu ficheiro de mock (ajusta o caminho se necessário)
+import { MOCK_USERS } from "@/data/mockUsers";
 
 export const UsersAnalysisTab = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  // Lógica de filtragem adaptada à nova estrutura (type e status)
   const filteredUsers = useMemo(() => {
-    if (statusFilter === "all") return usersAnalyticsData;
-    if (statusFilter === "active") {
-      return usersAnalyticsData.filter(
-        (user) => user.status === "active" || user.status === "premium" || user.status === "free"
-      );
-    }
-    return usersAnalyticsData.filter((user) => user.status === statusFilter);
+    if (statusFilter === "all") return MOCK_USERS;
+    if (statusFilter === "premium") return MOCK_USERS.filter((user) => user.type === "PREMIUM");
+    if (statusFilter === "free") return MOCK_USERS.filter((user) => user.type === "FREE");
+    if (statusFilter === "inactive") return MOCK_USERS.filter((user) => user.status === "inactive" || user.status === "suspended");
+
+    return MOCK_USERS;
   }, [statusFilter]);
 
   const paginatedUsers = useMemo(() => {
@@ -45,30 +47,30 @@ export const UsersAnalysisTab = () => {
     console.log("Relatório de Utilizadores CSV descarregado");
   };
 
-  const getStatusBadge = (status: string) => {
-    const config: Record<string, { label: string; className: string }> = {
-      premium: {
-        label: "Premium",
-        className: "bg-amber-500 hover:bg-amber-600 text-white",
-      },
-      active: {
-        label: "Ativo",
-        className: "bg-emerald-500/10 text-emerald-600 border-emerald-200",
-      },
-      free: {
-        label: "Free",
-        className: "bg-blue-500/10 text-blue-600 border-blue-200",
-      },
-      inactive: {
-        label: "Inativo",
-        className: "bg-muted text-muted-foreground border-border",
-      },
-    };
-    const { label, className } = config[status] || config.free;
+  // Atualizado para gerar dois Badges: Um para o Tipo (Free/Premium) e outro para o Estado (Ativo/Inativo)
+  const getUserBadges = (type: string, status: string) => {
+    const isPremium = type === "PREMIUM";
+    const isActive = status === "active";
+    const isSuspended = status === "suspended";
+
     return (
-      <Badge variant={status === "premium" ? "default" : "outline"} className={className}>
-        {label}
-      </Badge>
+      <div className="flex flex-col gap-1 items-start">
+        <Badge
+          variant={isPremium ? "default" : "outline"}
+          className={isPremium ? "bg-amber-500 hover:bg-amber-600 text-white" : "bg-blue-500/10 text-blue-600 border-blue-200"}
+        >
+          {isPremium ? "Premium" : "Free"}
+        </Badge>
+
+        <Badge
+          variant="outline"
+          className={isActive ? "bg-emerald-500/10 text-emerald-600 border-emerald-200 text-[10px] px-1.5 py-0" :
+            isSuspended ? "bg-red-500/10 text-red-600 border-red-200 text-[10px] px-1.5 py-0" :
+              "bg-muted text-muted-foreground border-border text-[10px] px-1.5 py-0"}
+        >
+          {isActive ? "Ativo" : isSuspended ? "Suspenso" : "Inativo"}
+        </Badge>
+      </div>
     );
   };
 
@@ -82,15 +84,17 @@ export const UsersAnalysisTab = () => {
   };
 
   const formatDate = (dateString: string) => {
+    if (!dateString) return "-";
     return format(new Date(dateString), "dd MMM yyyy", { locale: pt });
   };
 
+  // Contagens dinâmicas
   const segmentCounts = useMemo(() => {
     return {
-      all: usersAnalyticsData.length,
-      premium: usersAnalyticsData.filter((u) => u.status === "premium").length,
-      free: usersAnalyticsData.filter((u) => u.status === "free").length,
-      inactive: usersAnalyticsData.filter((u) => u.status === "inactive").length,
+      all: MOCK_USERS.length,
+      premium: MOCK_USERS.filter((u) => u.type === "PREMIUM").length,
+      free: MOCK_USERS.filter((u) => u.type === "FREE").length,
+      inactive: MOCK_USERS.filter((u) => u.status === "inactive" || u.status === "suspended").length,
     };
   }, []);
 
@@ -155,10 +159,10 @@ export const UsersAnalysisTab = () => {
                 <TableRow>
                   <TableHead>Utilizador</TableHead>
                   <TableHead>Email</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Conta / Estado</TableHead>
                   <TableHead>Data Registo</TableHead>
                   <TableHead>Último Acesso</TableHead>
-                  <TableHead className="text-right">Total Km</TableHead>
+                  <TableHead className="text-right">Percursos Acedidos</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -184,11 +188,15 @@ export const UsersAnalysisTab = () => {
                       <TableCell className="text-muted-foreground">
                         {user.email}
                       </TableCell>
-                      <TableCell>{getStatusBadge(user.status)}</TableCell>
-                      <TableCell>{formatDate(user.registrationDate)}</TableCell>
+                      <TableCell>
+                        {/* Agora renderiza tipo de conta e estado */}
+                        {getUserBadges(user.type, user.status)}
+                      </TableCell>
+                      <TableCell>{formatDate(user.signupDate)}</TableCell>
                       <TableCell>{formatDate(user.lastAccess)}</TableCell>
                       <TableCell className="text-right font-medium">
-                        {user.totalKm.toLocaleString("pt-PT")} km
+                        {/* Substitui Km por métricas reais da tua Mock Data */}
+                        {user.routesAccessed}
                       </TableCell>
                     </TableRow>
                   ))

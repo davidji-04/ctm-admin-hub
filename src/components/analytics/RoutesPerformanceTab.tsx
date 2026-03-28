@@ -19,26 +19,60 @@ import {
 } from "@/components/ui/table";
 import { Download, Filter, Star } from "lucide-react";
 import { toast } from "sonner";
-import {
-  routesPerformanceData,
-  difficultyOptions,
-  regionOptions,
-  RoutePerformance,
-} from "@/data/analyticsMockData";
+
+// Importa os teus dados de mock
+import { SHARED_MOCK_ROUTES } from "@/data/mockData";
+import { MOCK_ITINERARIES } from "@/data/mockItineraries";
 
 export const RoutesPerformanceTab = () => {
   const [difficultyFilter, setDifficultyFilter] = useState("all");
   const [regionFilter, setRegionFilter] = useState("all");
 
+  // Preparar os dados para a tabela
+  const enrichedRoutes = useMemo(() => {
+    return SHARED_MOCK_ROUTES.map((route) => {
+      // Contar quantos roteiros foram criados a partir deste percurso base
+      const itinerariesCreated = MOCK_ITINERARIES.filter(
+        (it) => it.basePercursoName === route.title
+      ).length;
+
+      return {
+        ...route,
+        name: route.title,
+        difficulty: route.difficulty || "medium", // Fallback de segurança
+        region: route.country,
+        // totalAccesses, completionRate e rating agora vêm direto do mockData
+        itinerariesCreated,
+      };
+    });
+  }, []);
+
+  // Extrair opções dinâmicas para os filtros
+  const regionOptions = useMemo(() => {
+    const uniqueRegions = Array.from(new Set(enrichedRoutes.map((r) => r.region)));
+    return [
+      { value: "all", label: "Todas as Regiões" },
+      ...uniqueRegions.map((region) => ({ value: region, label: region })),
+    ];
+  }, [enrichedRoutes]);
+
+  const difficultyOptions = [
+    { value: "all", label: "Todas as Dificuldades" },
+    { value: "easy", label: "Fácil" },
+    { value: "medium", label: "Média" },
+    { value: "hard", label: "Difícil" },
+  ];
+
+  // Aplicar filtros
   const filteredRoutes = useMemo(() => {
-    return routesPerformanceData.filter((route) => {
+    return enrichedRoutes.filter((route) => {
       const matchesDifficulty =
         difficultyFilter === "all" || route.difficulty === difficultyFilter;
       const matchesRegion =
         regionFilter === "all" || route.region === regionFilter;
       return matchesDifficulty && matchesRegion;
     });
-  }, [difficultyFilter, regionFilter]);
+  }, [enrichedRoutes, difficultyFilter, regionFilter]);
 
   const handleExport = () => {
     toast.success("Relatório de Percursos CSV descarregado com sucesso!");
@@ -56,9 +90,12 @@ export const RoutesPerformanceTab = () => {
       medium: "Média",
       hard: "Difícil",
     };
+
+    const safeDifficulty = colors[difficulty] ? difficulty : "medium";
+
     return (
-      <Badge variant="outline" className={colors[difficulty]}>
-        {labels[difficulty]}
+      <Badge variant="outline" className={colors[safeDifficulty]}>
+        {labels[safeDifficulty]}
       </Badge>
     );
   };
@@ -78,18 +115,20 @@ export const RoutesPerformanceTab = () => {
     );
   };
 
-  const renderStars = (rating: number) => {
+  const renderStars = (rating?: number) => {
+    const safeRating = rating ?? 0;
     return (
-      <div className="flex items-center gap-1">
+      <div className="flex justify-end items-center gap-1">
         <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-        <span className="font-medium">{rating.toFixed(1)}</span>
+        <span className="font-medium">{safeRating.toFixed(1)}</span>
       </div>
     );
   };
 
-  const getCompletionColor = (rate: number) => {
-    if (rate >= 80) return "text-emerald-600";
-    if (rate >= 60) return "text-amber-600";
+  const getCompletionColor = (rate?: number) => {
+    const safeRate = rate ?? 0;
+    if (safeRate >= 80) return "text-emerald-600";
+    if (safeRate >= 60) return "text-amber-600";
     return "text-destructive";
   };
 
@@ -187,13 +226,13 @@ export const RoutesPerformanceTab = () => {
                       <TableCell>{getCategoryBadge(route.category)}</TableCell>
                       <TableCell>{getDifficultyBadge(route.difficulty)}</TableCell>
                       <TableCell className="text-right">
-                        {route.totalAccesses.toLocaleString("pt-PT")}
+                        {route.totalAccesses?.toLocaleString("pt-PT") ?? "0"}
                       </TableCell>
                       <TableCell className="text-right">
                         {route.itinerariesCreated.toLocaleString("pt-PT")}
                       </TableCell>
                       <TableCell className={`text-right font-medium ${getCompletionColor(route.completionRate)}`}>
-                        {route.completionRate}%
+                        {route.completionRate ?? 0}%
                       </TableCell>
                       <TableCell className="text-right">
                         {renderStars(route.rating)}

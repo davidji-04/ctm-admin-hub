@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Route, Users, Star, TrendingUp, MapPin, AlertCircle, Crown, UserCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -11,49 +12,99 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Cell,
 } from "recharts";
 
+// 1. Importa os teus ficheiros de mock data
+import { SHARED_MOCK_ROUTES } from "@/data/mockData";
+import { MOCK_USERS } from "@/data/mockUsers";
+import { MOCK_ITINERARIES } from "@/data/mockItineraries";
+
 const Dashboard = () => {
+  // 2. Cálculos Dinâmicos baseados na Mock Data
+  const totalRoutes = SHARED_MOCK_ROUTES.length;
+  const totalUsers = MOCK_USERS.length;
+  const activeUsers = MOCK_USERS.filter((user) => user.status === "active").length;
+  const premiumUsers = MOCK_USERS.filter((user) => user.type === "PREMIUM").length;
+  const premiumRoutes = SHARED_MOCK_ROUTES.filter((route) => route.category === "premium").length;
+
+  // Estatísticas Principais
   const stats = [
     {
       title: "Total de Percursos",
-      value: "47",
-      change: "+3 este mês",
+      value: totalRoutes.toString(),
       icon: Route,
       color: "text-primary",
     },
     {
       title: "Total de Utilizadores",
-      value: "2,847",
-      change: "+156 este mês",
+      value: totalUsers.toString(),
       icon: UserCheck,
       color: "text-info",
     },
     {
       title: "Utilizadores Premium",
-      value: "384",
-      change: "+42 este mês",
+      value: premiumUsers.toString(),
       icon: Crown,
       color: "text-warning",
     },
     {
       title: "Avaliação Média",
       value: "4.8",
-      change: "+0.2 melhoria",
       icon: Star,
       color: "text-success",
     },
     {
       title: "Roteiros Premium",
-      value: "23",
-      change: "+5 este mês",
+      value: premiumRoutes.toString(),
       icon: TrendingUp,
       color: "text-accent",
     },
   ];
 
-  // Mock data for Active Users line chart
+  // 3. Funil de Conversão Dinâmico
+  const conversionData = [
+    {
+      stage: "Total de Inscrições",
+      value: totalUsers,
+      percentage: totalUsers > 0 ? 100 : 0
+    },
+    {
+      stage: "Utilizadores Ativos",
+      value: activeUsers,
+      percentage: totalUsers > 0 ? Math.round((activeUsers / totalUsers) * 100) : 0
+    },
+    {
+      stage: "Conversão Premium",
+      value: premiumUsers,
+      percentage: totalUsers > 0 ? Math.round((premiumUsers / totalUsers) * 100) : 0
+    },
+  ];
+
+  // Taxa de conversão global calculada de forma segura
+  const globalConversionRate = totalUsers > 0
+    ? ((premiumUsers / totalUsers) * 100).toFixed(1)
+    : "0.0";
+
+  // Mapear os percursos recentes
+  const recentRoutes = SHARED_MOCK_ROUTES.slice(0, 3).map((route) => ({
+    id: route.id,
+    name: route.title,
+    status: route.status === "active" ? "ativo" : route.status === "draft" ? "rascunho" : "inativo",
+    localities: route.localities,
+    distance: route.distance,
+  }));
+
+  // Mapear rascunhos para ações pendentes automaticamente
+  const pendingActions = SHARED_MOCK_ROUTES
+    .filter(route => route.status === "draft" || route.status === "inactive")
+    .map((route, index) => ({
+      id: index + 1,
+      type: "Percurso",
+      message: route.status === "draft" ? "Rascunho de percurso precisa de publicação" : "Percurso inativo precisa de revisão",
+      route: route.title,
+    }));
+
+  // Dados para os gráficos estáticos (Podes mantê-los assim enquanto não tens histórico de datas)
   const activeUsersData = [
     { month: "Jan", users: 1420 },
     { month: "Feb", users: 1680 },
@@ -65,33 +116,12 @@ const Dashboard = () => {
     { month: "Aug", users: 2847 },
   ];
 
-  // Mock data for Most Accessed Routes bar chart
   const mostAccessedRoutes = [
     { name: "Caminho Português", accesses: 4567 },
     { name: "Rota Vicentina", accesses: 3892 },
     { name: "Via Algarviana", accesses: 3245 },
     { name: "Serra da Estrela", accesses: 2876 },
     { name: "Gerês Trail", accesses: 2543 },
-  ];
-
-  // Mock data for Conversion Rate funnel
-  const conversionData = [
-    { stage: "Inscrições Grátis", value: 2463, percentage: 100 },
-    { stage: "Utilizadores Ativos", value: 1847, percentage: 75 },
-    { stage: "Período Experimental", value: 923, percentage: 37 },
-    { stage: "Conversão Premium", value: 384, percentage: 16 },
-  ];
-
-  const pendingActions = [
-    { id: 1, type: "Avaliação", message: "Nova avaliação pendente de aprovação", route: "Caminho Português" },
-    { id: 2, type: "Percurso", message: "Rascunho de percurso precisa de publicação", route: "Via Algarviana" },
-    { id: 3, type: "Alerta", message: "Alerta meteorológico acionado", route: "Rota Vicentina" },
-  ];
-
-  const recentRoutes = [
-    { id: 1, name: "Caminho Português", status: "ativo", localities: 12, distance: "245 km" },
-    { id: 2, name: "Via Algarviana", status: "rascunho", localities: 8, distance: "187 km" },
-    { id: 3, name: "Rota Vicentina", status: "ativo", localities: 15, distance: "320 km" },
   ];
 
   return (
@@ -112,15 +142,12 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground mt-1">{stat.change}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Visualizações de Dados - Gráficos */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Active Users Line Chart */}
         <Card>
           <CardHeader>
             <CardTitle>Utilizadores Ativos</CardTitle>
@@ -130,36 +157,15 @@ const Dashboard = () => {
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={activeUsersData}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis 
-                  dataKey="month" 
-                  className="text-xs"
-                  tick={{ fill: "hsl(var(--muted-foreground))" }}
-                />
-                <YAxis 
-                  className="text-xs"
-                  tick={{ fill: "hsl(var(--muted-foreground))" }}
-                />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "var(--radius)",
-                  }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="users" 
-                  stroke="hsl(var(--chart-1))" 
-                  strokeWidth={2}
-                  dot={{ fill: "hsl(var(--chart-1))", r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
+                <XAxis dataKey="month" className="text-xs" tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                <YAxis className="text-xs" tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "var(--radius)" }} />
+                <Line type="monotone" dataKey="users" stroke="hsl(var(--chart-1))" strokeWidth={2} dot={{ fill: "hsl(var(--chart-1))", r: 4 }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Gráfico de Barras dos Percursos Mais Acedidos */}
         <Card>
           <CardHeader>
             <CardTitle>Percursos Mais Acedidos</CardTitle>
@@ -169,25 +175,9 @@ const Dashboard = () => {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={mostAccessedRoutes} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis 
-                  type="number"
-                  className="text-xs"
-                  tick={{ fill: "hsl(var(--muted-foreground))" }}
-                />
-                <YAxis 
-                  type="category" 
-                  dataKey="name" 
-                  width={120}
-                  className="text-xs"
-                  tick={{ fill: "hsl(var(--muted-foreground))" }}
-                />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "var(--radius)",
-                  }}
-                />
+                <XAxis type="number" className="text-xs" tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                <YAxis type="category" dataKey="name" width={120} className="text-xs" tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "var(--radius)" }} />
                 <Bar dataKey="accesses" fill="hsl(var(--chart-2))" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -195,11 +185,10 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Conversion Rate Funnel */}
       <Card>
         <CardHeader>
           <CardTitle>Taxa de Conversão (GRÁTIS → PREMIUM)</CardTitle>
-          <CardDescription>Funil de conversão de utilizadores de inscrição a premium</CardDescription>
+          <CardDescription>Funil dinâmico de conversão baseado no total de utilizadores</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -221,7 +210,7 @@ const Dashboard = () => {
                       color: "hsl(var(--primary-foreground))",
                     }}
                   >
-                    {stage.percentage >= 20 && `${stage.percentage}%`}
+                    {stage.percentage >= 15 && `${stage.percentage}%`}
                   </div>
                 </div>
               </div>
@@ -230,7 +219,7 @@ const Dashboard = () => {
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium">Taxa de Conversão Global</span>
                 <Badge variant="default" className="text-base">
-                  {((conversionData[3].value / conversionData[0].value) * 100).toFixed(1)}%
+                  {globalConversionRate}%
                 </Badge>
               </div>
             </div>
@@ -238,18 +227,18 @@ const Dashboard = () => {
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2 mt-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-warning" />
               Ações Pendentes
             </CardTitle>
-            <CardDescription>Itens que requerem sua atenção</CardDescription>
+            <CardDescription>Itens que requerem a tua atenção</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {pendingActions.map((action) => (
+              {pendingActions.length > 0 ? pendingActions.map((action) => (
                 <div key={action.id} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -259,7 +248,9 @@ const Dashboard = () => {
                     <p className="text-sm text-muted-foreground">{action.message}</p>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <p className="text-sm text-muted-foreground">Não há ações pendentes.</p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -298,4 +289,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Dashboard; 

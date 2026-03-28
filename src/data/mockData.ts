@@ -7,12 +7,17 @@ export const SHARED_MOCK_ROUTES = [
     country: "Portugal",
     status: "active",
     category: "premium",
+    difficulty: "medium",
     distance: "245 km",
     localities: 12,
     modality: "walking",
     lastUpdated: "2024-01-15",
     startCoordinates: [41.1579, -8.6291] as [number, number],
-    gpxUrl: "/gpx/exemplo.gpx", // Associado ao teu ficheiro!
+    gpxUrl: "/gpx/exemplo.gpx",
+    // Novos atributos de Analytics
+    totalAccesses: 12450,
+    completionRate: 78,
+    rating: 4.8,
   },
   {
     id: 2,
@@ -20,12 +25,17 @@ export const SHARED_MOCK_ROUTES = [
     country: "Portugal",
     status: "draft",
     category: "free",
+    difficulty: "hard",
     distance: "187 km",
     localities: 8,
     modality: "bike",
     lastUpdated: "2024-01-14",
     startCoordinates: [37.2985, -7.9304] as [number, number],
-    gpxUrl: "/exemplo.gpx", // Podes usar o mesmo ficheiro para testar noutro percurso
+    gpxUrl: "/exemplo.gpx",
+    // Novos atributos de Analytics
+    totalAccesses: 4320,
+    completionRate: 55, // Taxa mais baixa por ser difícil
+    rating: 4.5,
   },
   {
     id: 3,
@@ -33,12 +43,17 @@ export const SHARED_MOCK_ROUTES = [
     country: "Portugal",
     status: "active",
     category: "premium",
+    difficulty: "medium",
     distance: "320 km",
     localities: 15,
     modality: "walking",
     lastUpdated: "2024-01-12",
     startCoordinates: [37.9577, -8.7853] as [number, number],
     gpxUrl: "/exemplo.gpx",
+    // Novos atributos de Analytics
+    totalAccesses: 8900,
+    completionRate: 82,
+    rating: 4.9, // Muito bem avaliada
   },
   {
     id: 4,
@@ -46,12 +61,17 @@ export const SHARED_MOCK_ROUTES = [
     country: "Portugal",
     status: "active",
     category: "free",
+    difficulty: "easy",
     distance: "280 km",
     localities: 18,
     modality: "walking",
     lastUpdated: "2024-01-10",
     startCoordinates: [41.6901, -8.8344] as [number, number],
-    gpxUrl: undefined, // Deixei este sem GPX para veres como a interface reage quando não há ficheiro
+    gpxUrl: undefined,
+    // Novos atributos de Analytics
+    totalAccesses: 15600, // Muito popular
+    completionRate: 91,
+    rating: 4.7,
   },
   {
     id: 5,
@@ -59,11 +79,16 @@ export const SHARED_MOCK_ROUTES = [
     country: "Portugal",
     status: "inactive",
     category: "free",
+    difficulty: "easy",
     distance: "65 km",
     localities: 6,
     modality: "bike",
     lastUpdated: "2023-12-20",
     startCoordinates: [37.1893, -7.4428] as [number, number],
     gpxUrl: undefined,
+    // Novos atributos de Analytics
+    totalAccesses: 2100,
+    completionRate: 64,
+    rating: 4.2,
   },
 ];

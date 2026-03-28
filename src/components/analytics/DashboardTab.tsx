@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,13 +34,11 @@ import {
   Cell,
 } from "recharts";
 import { toast } from "sonner";
-import {
-  kpiData,
-  activeUsersData,
-  topRoutesData,
-  conversionFunnelData,
-  alertsData,
-} from "@/data/analyticsMockData";
+
+// Importa os teus ficheiros de mock data
+import { SHARED_MOCK_ROUTES } from "@/data/mockData";
+import { MOCK_USERS } from "@/data/mockUsers"; // Ajusta o caminho se tiveres os users noutro ficheiro
+import { MOCK_ITINERARIES } from "@/data/mockItineraries";
 
 export const DashboardTab = () => {
   const navigate = useNavigate();
@@ -49,68 +48,144 @@ export const DashboardTab = () => {
     console.log("Relatório CSV descarregado");
   };
 
+  // 1. Cálculos de KPIs Dinâmicos
+  const kpis = useMemo(() => {
+    const totalUsers = MOCK_USERS.length;
+    const premiumUsers = MOCK_USERS.filter(u => u.type === "PREMIUM").length;
+    const activeRoutes = SHARED_MOCK_ROUTES.filter(r => r.status === "active").length;
+
+    // Calcula a média de rating de todos os percursos (com segurança para evitar divisão por 0)
+    const validRatings = SHARED_MOCK_ROUTES.filter(r => r.rating);
+    const averageRating = validRatings.length > 0
+      ? validRatings.reduce((acc, r) => acc + (r.rating || 0), 0) / validRatings.length
+      : 0;
+
+    return { totalUsers, premiumUsers, activeRoutes, averageRating };
+  }, []);
+
   const kpiCards = [
     {
       title: "Utilizadores Totais",
-      value: kpiData.totalUsers.toLocaleString("pt-PT"),
-      trend: kpiData.totalUsersTrend,
+      value: kpis.totalUsers.toLocaleString("pt-PT"),
+      trend: 12, // Mantive um valor estático de tendência (já que não temos histórico)
       icon: Users,
       color: "text-blue-500",
       bgColor: "bg-blue-500/10",
     },
     {
       title: "Utilizadores Premium",
-      value: kpiData.premiumUsers.toLocaleString("pt-PT"),
-      trend: kpiData.premiumUsersTrend,
+      value: kpis.premiumUsers.toLocaleString("pt-PT"),
+      trend: 8,
       icon: Crown,
       color: "text-amber-500",
       bgColor: "bg-amber-500/10",
     },
     {
       title: "Percursos Ativos",
-      value: kpiData.activeRoutes.toString(),
-      trend: kpiData.activeRoutesTrend,
+      value: kpis.activeRoutes.toString(),
+      trend: 4,
       icon: Route,
       color: "text-emerald-500",
       bgColor: "bg-emerald-500/10",
     },
     {
       title: "Avaliação Média",
-      value: kpiData.averageRating.toFixed(1),
-      trend: kpiData.averageRatingTrend,
+      value: kpis.averageRating.toFixed(1),
+      trend: 2,
       icon: Star,
       color: "text-purple-500",
       bgColor: "bg-purple-500/10",
     },
   ];
 
+  // 2. Top Percursos Dinâmico (ordenar por acessos)
+  const topRoutesData = useMemo(() => {
+    return [...SHARED_MOCK_ROUTES]
+      .sort((a, b) => (b.totalAccesses || 0) - (a.totalAccesses || 0))
+      .slice(0, 5)
+      .map(route => ({
+        name: route.title,
+        accesses: route.totalAccesses || 0,
+      }));
+  }, []);
+
+  // 3. Funil de Conversão Dinâmico
+  const conversionFunnelData = useMemo(() => {
+    const activeUsers = MOCK_USERS.filter(u => u.status === "active").length;
+    return [
+      { stage: "Inscrições", value: kpis.totalUsers, fill: "hsl(var(--chart-1))" },
+      { stage: "Ativos", value: activeUsers, fill: "hsl(var(--chart-2))" },
+      { stage: "Premium", value: kpis.premiumUsers, fill: "hsl(var(--chart-3))" },
+    ];
+  }, [kpis.totalUsers, kpis.premiumUsers]);
+
+  // 4. Sistema de Alertas Inteligente
+  const dynamicAlerts = useMemo(() => {
+    const alerts = [];
+
+    // Alerta para percursos em rascunho
+    const draftRoutes = SHARED_MOCK_ROUTES.filter(r => r.status === "draft");
+    draftRoutes.forEach(r => {
+      alerts.push({
+        id: `route-${r.id}`,
+        type: "route",
+        priority: "medium",
+        message: `Rascunho pendente: ${r.title}`,
+        link: "/percursos",
+      });
+    });
+
+    // Alerta para utilizadores suspensos
+    const suspendedUsers = MOCK_USERS.filter(u => u.status === "suspended");
+    suspendedUsers.forEach(u => {
+      alerts.push({
+        id: `user-${u.id}`,
+        type: "user",
+        priority: "high",
+        message: `Utilizador suspenso: ${u.name}`,
+        link: "/utilizadores",
+      });
+    });
+
+    // Adicionamos um alerta de sistema para não ficar vazio caso tudo esteja normal
+    if (alerts.length === 0) {
+      alerts.push({
+        id: "sys-1",
+        type: "review",
+        priority: "low",
+        message: "Nenhuma ação pendente no momento.",
+        link: "#",
+      });
+    }
+
+    return alerts.slice(0, 4); // Mostra no máximo os 4 alertas mais relevantes
+  }, []);
+
+  // Dados estáticos para o gráfico de linha (precisaria de histórico temporal)
+  const activeUsersData = [
+    { day: "01/03", users: 120 }, { day: "05/03", users: 135 },
+    { day: "10/03", users: 125 }, { day: "15/03", users: 145 },
+    { day: "20/03", users: 160 }, { day: "25/03", users: 175 },
+    { day: "30/03", users: 190 },
+  ];
+
   const getAlertIcon = (type: string) => {
     switch (type) {
-      case "review":
-        return <MessageSquare className="h-4 w-4" />;
-      case "weather":
-        return <CloudRain className="h-4 w-4" />;
-      case "user":
-        return <UserPlus className="h-4 w-4" />;
-      case "route":
-        return <FileText className="h-4 w-4" />;
-      case "equipment":
-        return <Package className="h-4 w-4" />;
-      default:
-        return <AlertTriangle className="h-4 w-4" />;
+      case "review": return <MessageSquare className="h-4 w-4" />;
+      case "weather": return <CloudRain className="h-4 w-4" />;
+      case "user": return <UserPlus className="h-4 w-4" />;
+      case "route": return <FileText className="h-4 w-4" />;
+      case "equipment": return <Package className="h-4 w-4" />;
+      default: return <AlertTriangle className="h-4 w-4" />;
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "high":
-        return "bg-destructive/10 text-destructive border-destructive/20";
-      case "medium":
-        return "bg-amber-500/10 text-amber-600 border-amber-500/20";
-      case "low":
-        return "bg-muted text-muted-foreground border-border";
-      default:
-        return "bg-muted text-muted-foreground border-border";
+      case "high": return "bg-destructive/10 text-destructive border-destructive/20";
+      case "medium": return "bg-amber-500/10 text-amber-600 border-amber-500/20";
+      case "low": return "bg-muted text-muted-foreground border-border";
+      default: return "bg-muted text-muted-foreground border-border";
     }
   };
 
@@ -135,11 +210,10 @@ export const DashboardTab = () => {
                 </div>
                 <Badge
                   variant="outline"
-                  className={`gap-1 ${
-                    kpi.trend >= 0
+                  className={`gap-1 ${kpi.trend >= 0
                       ? "text-emerald-600 border-emerald-200 bg-emerald-50"
                       : "text-destructive border-destructive/20 bg-destructive/10"
-                  }`}
+                    }`}
                 >
                   {kpi.trend >= 0 ? (
                     <TrendingUp className="h-3 w-3" />
@@ -296,7 +370,7 @@ export const DashboardTab = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {alertsData.map((alert) => (
+            {dynamicAlerts.map((alert) => (
               <div
                 key={alert.id}
                 onClick={() => navigate(alert.link)}
