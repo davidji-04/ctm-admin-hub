@@ -92,3 +92,33 @@ export const SHARED_MOCK_ROUTES = [
     rating: 4.2,
   },
 ];
+
+export type SharedRouteType = 'percurso' | 'roteiro';
+
+export interface SharedMockClient {
+  id: string;
+  name: string;
+}
+
+export interface SharedMockRouteOption {
+  id: string;
+  name: string;
+  distance: string;
+  est_time: string;
+  type: SharedRouteType;
+  clientId?: string;
+}
+
+export const SHARED_MOCK_CLIENTS: SharedMockClient[] = [
+  { id: 'u1', name: 'João Silva' },
+  { id: 'u2', name: 'Maria Santos' },
+  { id: 'u3', name: 'Pedro Costa' },
+];
+
+export const SHARED_MOCK_ROUTE_OPTIONS: SharedMockRouteOption[] = [
+  { id: '1', name: 'Caminho Português', distance: '245 km', est_time: '12 dias', type: 'percurso' },
+  { id: '2', name: 'Rota Vicentina', distance: '320 km', est_time: '15 dias', type: 'percurso' },
+  { id: '3', name: 'Via Algarviana', distance: '300 km', est_time: '14 dias', type: 'percurso' },
+  { id: '4', name: 'Roteiro Premium Norte', distance: '120 km', est_time: '6 dias', type: 'roteiro', clientId: 'u1' },
+  { id: '5', name: 'Roteiro Premium Costa', distance: '90 km', est_time: '5 dias', type: 'roteiro', clientId: 'u2' },
+];

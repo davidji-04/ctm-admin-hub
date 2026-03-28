@@ -19,6 +19,9 @@ export interface Equipment {
   linkedRoutes: {
     routeId: string;
     routeName: string;
+    routeType?: 'percurso' | 'roteiro';
+    clientId?: string;
+    clientName?: string;
     priority: EquipmentPriority;
   }[];
   createdAt: string;

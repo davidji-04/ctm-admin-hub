@@ -31,6 +31,7 @@ import { Equipment, EquipmentFormData, EquipmentCategory, EQUIPMENT_CATEGORY_LAB
 import { toast } from 'sonner';
 import { Plus, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { SHARED_MOCK_CLIENTS, SHARED_MOCK_ROUTE_OPTIONS } from '@/data/mockData';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -46,12 +47,8 @@ interface AddEditEquipmentModalProps {
   equipment?: Equipment;
 }
 
-// Mock routes for linking
-const MOCK_ROUTES = [
-  { id: 'r1', name: 'Caminho Português' },
-  { id: 'r2', name: 'Rota da Montanha' },
-  { id: 'r3', name: 'Via Lusitana' },
-];
+const MOCK_ROUTES = SHARED_MOCK_ROUTE_OPTIONS;
+const MOCK_CLIENTS = SHARED_MOCK_CLIENTS;
 
 export const AddEditEquipmentModal = ({
   open,
@@ -61,6 +58,7 @@ export const AddEditEquipmentModal = ({
 }: AddEditEquipmentModalProps) => {
   const [linkedRoutes, setLinkedRoutes] = useState<Equipment['linkedRoutes']>([]);
   const [selectedRoute, setSelectedRoute] = useState<string>('');
+  const [selectedClientId, setSelectedClientId] = useState<string>('');
   const [selectedPriority, setSelectedPriority] = useState<EquipmentPriority>('opcional');
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -112,25 +110,38 @@ export const AddEditEquipmentModal = ({
     const route = MOCK_ROUTES.find((r) => r.id === selectedRoute);
     if (!route) return;
 
+    if (route.type === 'roteiro' && !selectedClientId) {
+      toast.error('Selecione o cliente para associar ao roteiro');
+      return;
+    }
+
     if (linkedRoutes.some((lr) => lr.routeId === selectedRoute)) {
       toast.error('Este percurso já está vinculado');
       return;
     }
+
+    const selectedClient = MOCK_CLIENTS.find((c) => c.id === selectedClientId);
 
     setLinkedRoutes([
       ...linkedRoutes,
       {
         routeId: route.id,
         routeName: route.name,
+        routeType: route.type,
+        clientId: route.type === 'roteiro' ? selectedClient?.id : undefined,
+        clientName: route.type === 'roteiro' ? selectedClient?.name : undefined,
         priority: selectedPriority,
       },
     ]);
     setSelectedRoute('');
+    setSelectedClientId('');
   };
 
   const handleRemoveRoute = (routeId: string) => {
     setLinkedRoutes(linkedRoutes.filter((lr) => lr.routeId !== routeId));
   };
+
+  const selectedRouteType = MOCK_ROUTES.find((route) => route.id === selectedRoute)?.type;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -217,16 +228,16 @@ export const AddEditEquipmentModal = ({
             />
 
             <div className="space-y-3">
-              <h3 className="text-sm font-medium">Recomendações por Percurso</h3>
+              <h3 className="text-sm font-medium">Recomendações por Percurso / Roteiro</h3>
               <div className="flex gap-2">
                 <Select value={selectedRoute} onValueChange={setSelectedRoute}>
                   <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Selecione um percurso" />
+                    <SelectValue placeholder="Selecione um percurso ou roteiro" />
                   </SelectTrigger>
                   <SelectContent>
                     {MOCK_ROUTES.map((route) => (
                       <SelectItem key={route.id} value={route.id}>
-                        {route.name}
+                        {route.name} ({route.type === 'roteiro' ? 'Roteiro' : 'Percurso'})
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -248,12 +259,37 @@ export const AddEditEquipmentModal = ({
                 </Button>
               </div>
 
+              {selectedRouteType === 'roteiro' && (
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground">
+                    Para roteiro, a associação ao cliente é obrigatória.
+                  </p>
+                  <Select value={selectedClientId} onValueChange={setSelectedClientId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o cliente do roteiro" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MOCK_CLIENTS.map((client) => (
+                        <SelectItem key={client.id} value={client.id}>
+                          {client.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               {linkedRoutes.length > 0 && (
                 <div className="space-y-2 border rounded-md p-3">
                   {linkedRoutes.map((link) => (
                     <div key={link.routeId} className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="text-sm">{link.routeName}</span>
+                        {link.routeType === 'roteiro' && link.clientName && (
+                          <Badge variant="secondary" className="text-xs">
+                            Cliente: {link.clientName}
+                          </Badge>
+                        )}
                         <Badge variant="outline" className="text-xs">
                           {EQUIPMENT_PRIORITY_LABELS[link.priority]}
                         </Badge>
