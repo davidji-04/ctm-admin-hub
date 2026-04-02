@@ -7,6 +7,7 @@ import { Step4EditorialContent } from "@/components/routes/wizard/Step4Editorial
 import { Step5Media } from "@/components/routes/wizard/Step5Media";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { SHARED_MOCK_ROUTES } from "@/data/mockData";
 
 const CreateRouteContent = () => {
   const { currentStep, wizardData, updateWizardData } = useWizard();
@@ -23,53 +24,60 @@ const CreateRouteContent = () => {
   const loadRouteData = async (id: string) => {
     setIsLoading(true);
     try {
-      // Mock API call to load route data
       await new Promise((resolve) => setTimeout(resolve, 800));
-
-      // Mock data - in production this would come from API
-      const mockRouteData = {
-        routeId: id,
-        step1: {
-          title: 'Caminho Português',
-          localidade_pais: 'PT',
-          categoria: 'premium' as const,
-          modalidade: ['a_pe'],
-          dificuldade_geral: 'media' as const,
-          status: 'ativo' as const,
-        },
-        step2: {
-          distancia_total: 245.5,
-          elevacao_altimetria: 2340,
-          tipo_terreno: 'mixed',
-        },
-        step3: {
-          descricao: 'Historic pilgrimage route through Portugal...',
-          historia_percurso: '',
-          destaques_unicos: '',
-          experiencia_cultural: '',
-          desafios_esperados: '',
-          certificacoes: '',
-          relatos_equipe: '',
-        },
-        step4: {
-          heroImage: null,
-          gallery: [],
-          gpxFile: null,
-        },
-      };
-
-      // Prefill wizard data
-      updateWizardData('routeId', mockRouteData.routeId);
-      updateWizardData('step1', mockRouteData.step1);
-      updateWizardData('step2', mockRouteData.step2);
-      updateWizardData('step3', mockRouteData.step3);
-      updateWizardData('step4', mockRouteData.step4);
+ 
+      const found = SHARED_MOCK_ROUTES.find((r) => r.id.toString() === id);
+ 
+      if (!found) {
+        console.warn(`Route ${id} not found in mock data`);
+        return;
+      }
+ 
+      updateWizardData('routeId', found.id.toString());
+      updateWizardData('step1', {
+        title: found.title,
+        localidade_pais: found.country === 'Portugal' ? 'PT' : found.country,
+        categoria: found.category as 'free' | 'premium',
+        modalidade: found.modality === 'bike' ? ['bicicleta'] : ['a_pe'],
+        dificuldade_geral:
+          found.difficulty === 'easy'
+            ? 'facil'
+            : found.difficulty === 'hard'
+              ? 'dificil'
+              : ('media' as 'facil' | 'media' | 'dificil'),
+        status:
+          found.status === 'active'
+            ? 'ativo'
+            : found.status === 'draft'
+              ? 'rascunho'
+              : ('inativo' as 'ativo' | 'rascunho' | 'inativo'),
+      });
+      updateWizardData('step2', {
+        distancia_total: Number.parseFloat(found.distance.replace(' km', '')) || 0,
+        elevacao_altimetria: undefined,
+        tipo_terreno: 'mixed',
+      });
+      updateWizardData('step3', {
+        descricao: `Detalhes do percurso ${found.title}.`,
+        historia_percurso: '',
+        destaques_unicos: '',
+        experiencia_cultural: '',
+        desafios_esperados: '',
+        certificacoes: '',
+        relatos_equipe: '',
+      });
+      updateWizardData('step4', {
+        heroImage: null,
+        gallery: [],
+        gpxFile: found.gpxUrl ?? null,
+      });
     } catch (error) {
       console.error('Failed to load route data:', error);
     } finally {
       setIsLoading(false);
     }
   };
+
 
   if (isLoading) {
     return (

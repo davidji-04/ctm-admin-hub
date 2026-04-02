@@ -14,6 +14,17 @@ import { ClientSelector } from '@/components/itineraries/ClientSelector';
 import { RouteSelector } from '@/components/itineraries/RouteSelector';
 import { ItineraryDetailsForm } from '@/components/itineraries/ItineraryDetailsForm';
 import { toast } from 'sonner';
+import { SHARED_MOCK_CLIENTS, SHARED_MOCK_ROUTE_OPTIONS } from '@/data/mockData';
+
+ const getClientName = (id?: string) => {
+    if (!id) return undefined;
+    return SHARED_MOCK_CLIENTS.find((c) => c.id === id)?.name;
+  };
+  
+  const getRouteName = (id?: string) => {
+    if (!id) return undefined;
+    return SHARED_MOCK_ROUTE_OPTIONS.find((r) => r.id === id)?.name;
+  };
 
 const CreateItinerary = () => {
   const navigate = useNavigate();
@@ -23,24 +34,6 @@ const CreateItinerary = () => {
   const detailsFormRef = useRef<HTMLFormElement>(null);
   const totalSteps = 3;
 
-  // Mock data - replace with actual API calls
-  const getClientName = (id?: string) => {
-    const clients: Record<string, string> = {
-      'client-1': 'João Silva',
-      'client-2': 'Maria Santos',
-      'client-3': 'Pedro Costa',
-    };
-    return id ? clients[id] : undefined;
-  };
-
-  const getRouteName = (id?: string) => {
-    const routes: Record<string, string> = {
-      'route-1': 'Caminho Francês',
-      'route-2': 'Caminho Português',
-      'route-3': 'Caminho do Norte',
-    };
-    return id ? routes[id] : undefined;
-  };
 
   const steps = [
     { number: 1, title: 'Selecionar Cliente', description: 'Escolha o cliente para este roteiro' },

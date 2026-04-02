@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Search, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -27,33 +27,21 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { PremiumItinerary, ItineraryStatus, ITINERARY_STATUS_LABELS } from '@/types/premium-itinerary';
+import { getItineraries, Itinerary } from '@/data/mockItineraries';
 
-const PremiumItinerariesList = () => {
+  const PremiumItinerariesList = () => {
   const navigate = useNavigate();
-  
-  const [itineraries] = useState<PremiumItinerary[]>([
-    {
-      id: '1',
-      code: 'ITN-2024-001',
-      title: 'Caminho Francês - João Silva',
-      clientId: 'client-1',
-      clientName: 'João Silva',
-      basePercursoId: 'percurso-1',
-      basePercursoName: 'Caminho Francês',
-      basePercursoVersion: 1,
-      status: 'in_progress',
-      startDate: '2024-05-01',
-      endDate: '2024-06-15',
-      stages: [],
-      sharedWithClient: false,
-      percursoUpdated: true,
-      createdAt: '2024-01-15T10:00:00Z',
-      updatedAt: '2024-01-20T14:30:00Z',
-    },
-  ]);
-
+  const [itineraries, setItineraries] = useState<Itinerary[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<ItineraryStatus | 'all'>('all');
+ 
+  useEffect(() => {
+    getItineraries().then((data) => {
+      setItineraries(data);
+      setLoading(false);
+    });
+  }, []);
 
   const filteredItineraries = itineraries.filter((itinerary) => {
     const matchesSearch = 

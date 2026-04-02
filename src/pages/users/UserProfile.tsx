@@ -24,6 +24,8 @@ import {
   Camera,
   Activity,
 } from "lucide-react";
+import { getUserById, User } from "@/data/mockUsers";
+import { useState } from "react";
 
 interface UserProfile {
   id: string;
@@ -43,71 +45,35 @@ interface UserProfile {
     date: string;
   }>;
 }
-
-// Mock data
-const mockUserProfiles: Record<string, UserProfile> = {
-  "1": {
-    id: "1",
-    name: "João Silva",
-    email: "joao.silva@example.com",
-    type: "PREMIUM",
-    status: "active",
-    signupDate: "2024-01-15",
-    lastAccess: "2024-11-14",
-    routesAccessed: 45,
-    itinerariesCreated: 8,
-    memoriesRegistered: 23,
-    activityHistory: [
-      { id: "1", type: "route", title: "Rota da Serra da Estrela", date: "2024-11-14" },
-      { id: "2", type: "memory", title: "Sunset at Gerês", date: "2024-11-12" },
-      { id: "3", type: "itinerary", title: "3-Day Douro Valley Trip", date: "2024-11-10" },
-      { id: "4", type: "route", title: "Coastal Path Algarve", date: "2024-11-08" },
-      { id: "5", type: "memory", title: "Mountain Peak View", date: "2024-11-05" },
-    ],
-  },
-  "2": {
-    id: "2",
-    name: "Maria Santos",
-    email: "maria.santos@example.com",
-    type: "FREE",
-    status: "active",
-    signupDate: "2024-03-22",
-    lastAccess: "2024-11-13",
-    routesAccessed: 12,
-    itinerariesCreated: 0,
-    memoriesRegistered: 5,
-    activityHistory: [
-      { id: "1", type: "route", title: "Sintra Historical Walk", date: "2024-11-13" },
-      { id: "2", type: "memory", title: "Palace Garden", date: "2024-11-10" },
-      { id: "3", type: "route", title: "Lisbon Riverside", date: "2024-11-05" },
-    ],
-  },
-  "3": {
-    id: "3",
-    name: "Pedro Costa",
-    email: "pedro.costa@example.com",
-    type: "PREMIUM",
-    status: "active",
-    signupDate: "2023-11-10",
-    lastAccess: "2024-11-15",
-    routesAccessed: 78,
-    itinerariesCreated: 15,
-    memoriesRegistered: 42,
-    activityHistory: [
-      { id: "1", type: "itinerary", title: "Complete Azores Tour", date: "2024-11-15" },
-      { id: "2", type: "route", title: "Pico Mountain Ascent", date: "2024-11-14" },
-      { id: "3", type: "memory", title: "Volcanic Landscape", date: "2024-11-13" },
-      { id: "4", type: "route", title: "Madeira Levadas", date: "2024-11-10" },
-      { id: "5", type: "itinerary", title: "Porto Wine Route", date: "2024-11-08" },
-    ],
-  },
+const mockActivityHistory: Record<string, Array<{ id: string; type: "route" | "itinerary" | "memory"; title: string; date: string }>> = {
+  "1": [
+    { id: "1", type: "route", title: "Rota da Serra da Estrela", date: "2024-11-14" },
+    { id: "2", type: "memory", title: "Sunset at Gerês", date: "2024-11-12" },
+    { id: "3", type: "itinerary", title: "3-Day Douro Valley Trip", date: "2024-11-10" },
+    { id: "4", type: "route", title: "Coastal Path Algarve", date: "2024-11-08" },
+    { id: "5", type: "memory", title: "Mountain Peak View", date: "2024-11-05" },
+  ],
+  "2": [
+    { id: "1", type: "route", title: "Sintra Historical Walk", date: "2024-11-13" },
+    { id: "2", type: "memory", title: "Palace Garden", date: "2024-11-10" },
+    { id: "3", type: "route", title: "Lisbon Riverside", date: "2024-11-05" },
+  ],
+  "3": [
+    { id: "1", type: "route", title: "Caminho Português - Etapa 1", date: "2024-11-15" },
+    { id: "2", type: "memory", title: "Chegada a Porto", date: "2024-11-13" },
+  ],
+  "4": [
+    { id: "1", type: "itinerary", title: "Roteiro Algarve Premium", date: "2024-11-16" },
+    { id: "2", type: "route", title: "Via Algarviana", date: "2024-11-10" },
+  ],
+  "5": [],
 };
 
 export default function UserProfile() {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
 
-  const user = userId ? mockUserProfiles[userId] : null;
 
   if (!user) {
     return (
@@ -124,6 +90,7 @@ export default function UserProfile() {
       </div>
     );
   }
+  const activityHistory = mockActivityHistory[user.id] ?? [];
 
   const getActivityIcon = (type: string) => {
     switch (type) {
@@ -292,7 +259,7 @@ export default function UserProfile() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {user.activityHistory.map((activity) => (
+                  {activityHistory.map((activity) => (
                     <TableRow key={activity.id}>
                       <TableCell>
                         <div className="flex items-center gap-2">

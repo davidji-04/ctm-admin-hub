@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search, Eye, Crown, User, Calendar } from "lucide-react";
+import { getUsers, User as UserType } from "@/data/mockUsers";
 
 interface User {
   id: string;
@@ -34,78 +35,15 @@ interface User {
   itinerariesCreated: number;
   memoriesRegistered: number;
 }
-
-const mockUsers: User[] = [
-  {
-    id: "1",
-    name: "João Silva",
-    email: "joao.silva@example.com",
-    type: "PREMIUM",
-    status: "active",
-    signupDate: "2024-01-15",
-    lastAccess: "2024-11-14",
-    routesAccessed: 45,
-    itinerariesCreated: 8,
-    memoriesRegistered: 23,
-  },
-  {
-    id: "2",
-    name: "Maria Santos",
-    email: "maria.santos@example.com",
-    type: "FREE",
-    status: "active",
-    signupDate: "2024-03-22",
-    lastAccess: "2024-11-13",
-    routesAccessed: 12,
-    itinerariesCreated: 0,
-    memoriesRegistered: 5,
-  },
-  {
-    id: "3",
-    name: "Pedro Costa",
-    email: "pedro.costa@example.com",
-    type: "PREMIUM",
-    status: "active",
-    signupDate: "2023-11-10",
-    lastAccess: "2024-11-15",
-    routesAccessed: 78,
-    itinerariesCreated: 15,
-    memoriesRegistered: 42,
-  },
-  {
-    id: "4",
-    name: "Ana Ferreira",
-    email: "ana.ferreira@example.com",
-    type: "FREE",
-    status: "inactive",
-    signupDate: "2024-02-05",
-    lastAccess: "2024-07-20",
-    routesAccessed: 8,
-    itinerariesCreated: 0,
-    memoriesRegistered: 2,
-  },
-  {
-    id: "5",
-    name: "Carlos Oliveira",
-    email: "carlos.oliveira@example.com",
-    type: "FREE",
-    status: "active",
-    signupDate: "2024-10-28",
-    lastAccess: "2024-11-14",
-    routesAccessed: 3,
-    itinerariesCreated: 0,
-    memoriesRegistered: 1,
-  },
-];
-
 export default function UsersManager() {
   const navigate = useNavigate();
+  const [users, setUsers] = useState<UserType[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [activeTab, setActiveTab] = useState("all");
 
-  const filteredUsers = mockUsers.filter((user) => {
+  const filteredUsers = users.filter((user) => {
     const matchesSearch = 
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase());
@@ -126,12 +64,12 @@ export default function UsersManager() {
     return matchesSearch && matchesType && matchesStatus;
   });
 
-  const stats = {
-    total: mockUsers.length,
-    premium: mockUsers.filter(u => u.type === "PREMIUM").length,
-    free: mockUsers.filter(u => u.type === "FREE").length,
-    active: mockUsers.filter(u => u.status === "active").length,
-    inactive: mockUsers.filter(u => u.status === "inactive").length,
+    const stats = {
+    total: users.length,
+    premium: users.filter((u) => u.type === "PREMIUM").length,
+    free: users.filter((u) => u.type === "FREE").length,
+    active: users.filter((u) => u.status === "active").length,
+    inactive: users.filter((u) => u.status === "inactive").length,
   };
 
   const handleViewProfile = (userId: string) => {

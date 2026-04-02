@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Share2, AlertTriangle, Calendar, User, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -17,63 +17,34 @@ import { StagesList } from '@/components/itineraries/StagesList';
 import { SchedulesOverview } from '@/components/itineraries/SchedulesOverview';
 import { AddEditStageModal } from '@/components/itineraries/AddEditStageModal';
 import { toast } from 'sonner';
+import { getItineraryById, Itinerary } from '@/data/mockItineraries';
+
 
 const ManageItinerary = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isAddStageModalOpen, setIsAddStageModalOpen] = useState(false);
+  const [itinerary, setItinerary] = useState<Itinerary | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const [itinerary] = useState<PremiumItinerary>({
-    id: id || '1',
-    code: 'ITN-2024-001',
-    title: 'Caminho Francês - João Silva',
-    clientId: 'client-1',
-    clientName: 'João Silva',
-    basePercursoId: 'percurso-1',
-    basePercursoName: 'Caminho Francês',
-    basePercursoVersion: 1,
-    status: 'in_progress',
-    startDate: '2024-05-01',
-    endDate: '2024-06-15',
-    stages: [
-      {
-        id: 'stage-1',
-        itineraryId: id || '1',
-        order: 1,
-        title: 'Dia 1: Saint-Jean-Pied-de-Port a Roncesvalles',
-        description: 'Primeira etapa adaptada às capacidades do cliente',
-        startLocalityId: 'loc-1',
-        startLocalityName: 'Saint-Jean-Pied-de-Port',
-        endLocalityId: 'loc-2',
-        endLocalityName: 'Roncesvalles',
-        distance: 25.3,
-        estimatedDuration: 6.3,
-        difficulty: 'difficult',
-        schedules: [
-          {
-            id: 'sched-1',
-            stageId: 'stage-1',
-            type: 'accommodation',
-            title: 'Albergue Casa Sabina',
-            serviceId: 'service-1',
-            serviceName: 'Albergue Casa Sabina',
-            status: 'confirmed',
-            bookingReference: 'REF-12345',
-            cost: 45,
-          },
-        ],
-      },
-    ],
-    trainingPlanId: 'training-1',
-    sharedWithClient: false,
-    percursoUpdated: true,
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-20T14:30:00Z',
-  });
+  useEffect(() => {
+    if (!id) return;
+    getItineraryById(id).then((data) => {
+      setItinerary(data ?? null);
+      setLoading(false);
+    });
+  }, [id]);
 
   const handleShareWithClient = () => {
     toast.success('Roteiro partilhado com o cliente via app mobile!');
   };
+  const normalizedStages = itinerary.stages.map((stage) => ({
+    ...stage,
+    difficulty: (stage.difficulty === 'extreme' ? 'difficult' : stage.difficulty) as
+      | 'easy'
+      | 'moderate'
+      | 'difficult',
+  }));
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -199,7 +170,7 @@ const ManageItinerary = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <StagesList stages={itinerary.stages} />
+              <StagesList stages={normalizedStages} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -213,7 +184,7 @@ const ManageItinerary = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <SchedulesOverview stages={itinerary.stages} />
+              <SchedulesOverview stages={normalizedStages} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -251,12 +222,6 @@ const ManageItinerary = () => {
                   </p>
                 </div>
               </div>
-              {itinerary.notes && (
-                <div>
-                  <label className="text-sm font-medium">Notas</label>
-                  <p className="text-sm text-muted-foreground mt-1">{itinerary.notes}</p>
-                </div>
-              )}
             </CardContent>
           </Card>
         </TabsContent>
