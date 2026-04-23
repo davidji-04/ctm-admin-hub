@@ -6,13 +6,14 @@ interface WizardProgressProps {
 }
 
 export const WizardProgress = ({ currentStep, totalSteps }: WizardProgressProps) => {
-  const steps = [
+  const allSteps = [
     { number: 1, label: "Basic Info" },
     { number: 2, label: "Technical" },
     { number: 3, label: "Localities" },
     { number: 4, label: "Editorial" },
     { number: 5, label: "Media" },
   ];
+  const steps = allSteps.slice(0, totalSteps);
 
   const progress = (currentStep / totalSteps) * 100;
 

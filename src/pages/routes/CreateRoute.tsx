@@ -4,7 +4,6 @@ import { Step1BasicInfo } from "@/components/routes/wizard/Step1BasicInfo";
 import { Step2TechnicalInfo } from "@/components/routes/wizard/Step2TechnicalInfo";
 import { Step3Localities } from "@/components/routes/wizard/Step3Localities";
 import { Step4EditorialContent } from "@/components/routes/wizard/Step4EditorialContent";
-import { Step5Media } from "@/components/routes/wizard/Step5Media";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { SHARED_MOCK_ROUTES } from "@/data/mockData";
@@ -100,18 +99,17 @@ const CreateRouteContent = () => {
         <p className="text-muted-foreground">
           {isEditMode
             ? 'Update route information across all steps'
-            : 'Follow the 5-step wizard to create a complete route with all necessary information'}
+            : 'Follow the 4-step wizard to create a complete route with all necessary information'}
         </p>
       </div>
 
-      <WizardProgress currentStep={currentStep} totalSteps={5} />
+      <WizardProgress currentStep={currentStep} totalSteps={4} />
 
       <div className="bg-card rounded-lg shadow-sm border p-8">
         {currentStep === 1 && <Step1BasicInfo />}
         {currentStep === 2 && <Step2TechnicalInfo />}
         {currentStep === 3 && <Step3Localities />}
         {currentStep === 4 && <Step4EditorialContent />}
-        {currentStep === 5 && <Step5Media />}
       </div>
     </div>
   );

@@ -116,12 +116,12 @@ export const Step4EditorialContent = () => {
         description:
           userRole === "editor"
             ? "Draft saved successfully"
-            : "Editorial content saved. Continue to final step.",
+            : "Editorial content saved successfully.",
       });
 
-      // Admin can continue to next step
+      // Wizard now ends on step 4.
       if (userRole === "admin") {
-        setCurrentStep(5);
+        navigate("/routes");
       }
     } catch (error) {
       toast({
