@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
-import { X, Upload, GripVertical, Images } from "lucide-react";
+import { X, Upload, GripVertical, Image as ImageIcon, Film } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   DndContext,
@@ -21,26 +21,48 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-interface GalleryImage {
+type MediaType = "image" | "video";
+
+interface MainMediaItem {
   id?: string;
   url?: string;
+  type?: MediaType;
 }
 
-interface GalleryUploadProps {
-  value: GalleryImage[];
-  onChange: (images: GalleryImage[]) => void;
+interface MainMediaUploadProps {
+  value: MainMediaItem[];
+  onChange: (items: MainMediaItem[]) => void;
   label?: string;
   description?: string;
-  maxImages?: number;
+  maxItems?: number;
 }
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const DEFAULT_MAX_IMAGES = 20;
-const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30MB
+const DEFAULT_MAX_ITEMS = 1;
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "video/mp4"];
 
-const SortableImage = ({ image, onRemove }: { image: { id: string; url: string }; onRemove: () => void }) => {
+const detectTypeFromUrl = (url?: string): MediaType => {
+  if (!url) {
+    return "image";
+  }
+
+  const lower = url.toLowerCase();
+  if (lower.endsWith(".mp4") || lower.includes("video")) {
+    return "video";
+  }
+
+  return "image";
+};
+
+const SortableMediaCard = ({
+  item,
+  onRemove,
+}: {
+  item: { id: string; url: string; type: MediaType };
+  onRemove: () => void;
+}) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: image.id,
+    id: item.id,
   });
 
   const style = {
@@ -50,12 +72,12 @@ const SortableImage = ({ image, onRemove }: { image: { id: string; url: string }
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="relative group rounded-lg overflow-hidden border bg-card"
-    >
-      <img src={image.url} alt="Gallery" className="w-full h-32 object-cover" />
+    <div ref={setNodeRef} style={style} className="relative group rounded-lg overflow-hidden border bg-card">
+      {item.type === "video" ? (
+        <video src={item.url} className="w-full h-48 object-cover" muted playsInline controls />
+      ) : (
+        <img src={item.url} alt="Main media" className="w-full h-48 object-cover" />
+      )}
       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
         <Button
           type="button"
@@ -81,7 +103,13 @@ const SortableImage = ({ image, onRemove }: { image: { id: string; url: string }
   );
 };
 
-export const GalleryUpload = ({ value, onChange, label, description, maxImages = DEFAULT_MAX_IMAGES }: GalleryUploadProps) => {
+export const MainMediaUpload = ({
+  value,
+  onChange,
+  label,
+  description,
+  maxItems = DEFAULT_MAX_ITEMS,
+}: MainMediaUploadProps) => {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
 
@@ -92,24 +120,29 @@ export const GalleryUpload = ({ value, onChange, label, description, maxImages =
     })
   );
 
+  const normalizedValue = value.map((item) => ({
+    ...item,
+    type: item.type ?? detectTypeFromUrl(item.url),
+  }));
+
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
-      if (value.length + acceptedFiles.length > maxImages) {
+      if (normalizedValue.length + acceptedFiles.length > maxItems) {
         toast({
-          title: "Too many images",
-          description: `Maximum ${maxImages} images allowed. You can add ${maxImages - value.length} more.`,
+          title: "Too many files",
+          description: `Maximum ${maxItems} file(s) allowed. You can add ${maxItems - normalizedValue.length} more.`,
           variant: "destructive",
         });
         return;
       }
 
       const validFiles: File[] = [];
-      
+
       for (const file of acceptedFiles) {
         if (file.size > MAX_FILE_SIZE) {
           toast({
             title: "File too large",
-            description: `${file.name} is too large. Max size is 5MB.`,
+            description: `${file.name} is too large. Max size is 30MB.`,
             variant: "destructive",
           });
           continue;
@@ -118,7 +151,7 @@ export const GalleryUpload = ({ value, onChange, label, description, maxImages =
         if (!ACCEPTED_TYPES.includes(file.type)) {
           toast({
             title: "Invalid file type",
-            description: `${file.name} is not a valid image type.`,
+            description: `${file.name} must be JPG, PNG, WebP, or MP4.`,
             variant: "destructive",
           });
           continue;
@@ -127,39 +160,41 @@ export const GalleryUpload = ({ value, onChange, label, description, maxImages =
         validFiles.push(file);
       }
 
-      if (validFiles.length === 0) return;
+      if (validFiles.length === 0) {
+        return;
+      }
 
       setIsUploading(true);
 
       try {
         const uploadPromises = validFiles.map(async (file) => {
-          // Mock upload - in production this would upload to real backend
           await new Promise((resolve) => setTimeout(resolve, 300));
 
           return {
-            id: `img-${Date.now()}-${Math.random()}`,
+            id: `media-${Date.now()}-${Math.random()}`,
             url: URL.createObjectURL(file),
-          };
+            type: file.type === "video/mp4" ? "video" : "image",
+          } as MainMediaItem;
         });
 
-        const newImages = await Promise.all(uploadPromises);
-        onChange([...value, ...newImages]);
+        const newItems = await Promise.all(uploadPromises);
+        onChange([...normalizedValue, ...newItems]);
 
         toast({
-          title: "Images uploaded",
-          description: `${newImages.length} image(s) added to gallery`,
+          title: "Media uploaded",
+          description: `${newItems.length} file(s) added`,
         });
       } catch (error) {
         toast({
           title: "Upload failed",
-          description: "Failed to upload images. Please try again.",
+          description: "Failed to upload files. Please try again.",
           variant: "destructive",
         });
       } finally {
         setIsUploading(false);
       }
     },
-    [value, onChange, toast]
+    [maxItems, normalizedValue, onChange, toast]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -168,46 +203,50 @@ export const GalleryUpload = ({ value, onChange, label, description, maxImages =
       "image/jpeg": [".jpg", ".jpeg"],
       "image/png": [".png"],
       "image/webp": [".webp"],
+      "video/mp4": [".mp4"],
     },
-    maxFiles: maxImages - value.length,
-    disabled: isUploading || value.length >= maxImages,
+    maxFiles: maxItems - normalizedValue.length,
+    disabled: isUploading || normalizedValue.length >= maxItems,
   });
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const oldIndex = value.findIndex((img) => img.id === active.id);
-      const newIndex = value.findIndex((img) => img.id === over.id);
-      onChange(arrayMove(value, oldIndex, newIndex));
+      const oldIndex = normalizedValue.findIndex((item) => item.id === active.id);
+      const newIndex = normalizedValue.findIndex((item) => item.id === over.id);
+      onChange(arrayMove(normalizedValue, oldIndex, newIndex));
     }
   };
 
   const handleRemove = (id?: string) => {
-    if (!id) return;
-    onChange(value.filter((img) => img.id !== id));
+    if (!id) {
+      return;
+    }
+    onChange(normalizedValue.filter((item) => item.id !== id));
   };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium">{label ?? "Gallery Images (Optional)"}</label>
+        <label className="text-sm font-medium">{label ?? "Main Media"}</label>
         <span className="text-xs text-muted-foreground">
-          {value.length} / {maxImages}
+          {normalizedValue.length} / {maxItems}
         </span>
       </div>
+
       {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
 
-      {value.length > 0 && (
+      {normalizedValue.length > 0 && (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={value.map((img) => img.id)} strategy={rectSortingStrategy}>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {value.map((image) =>
-                image.id ? (
-                  <SortableImage
-                    key={image.id}
-                    image={image as { id: string; url: string }}
-                    onRemove={() => handleRemove(image.id!)}
+          <SortableContext items={normalizedValue.map((item) => item.id)} strategy={rectSortingStrategy}>
+            <div className="grid grid-cols-1 gap-4">
+              {normalizedValue.map((item) =>
+                item.id && item.url ? (
+                  <SortableMediaCard
+                    key={item.id}
+                    item={{ id: item.id, url: item.url, type: item.type ?? "image" }}
+                    onRemove={() => handleRemove(item.id)}
                   />
                 ) : null
               )}
@@ -216,34 +255,27 @@ export const GalleryUpload = ({ value, onChange, label, description, maxImages =
         </DndContext>
       )}
 
-      {value.length < maxImages && (
+      {normalizedValue.length < maxItems && (
         <div
           {...getRootProps()}
           className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-            isDragActive
-              ? "border-primary bg-primary/5"
-              : "border-border hover:border-primary/50"
-          } ${isUploading || value.length >= maxImages ? "opacity-50 cursor-not-allowed" : ""}`}
+            isDragActive ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+          } ${isUploading || normalizedValue.length >= maxItems ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           <input {...getInputProps()} />
           <div className="flex flex-col items-center gap-2">
             <div className="rounded-full bg-primary/10 p-3">
-              {isUploading ? (
-                <Upload className="h-5 w-5 text-primary animate-pulse" />
-              ) : (
-                <Images className="h-5 w-5 text-primary" />
-              )}
+              {isUploading ? <Upload className="h-5 w-5 text-primary animate-pulse" /> : <Film className="h-5 w-5 text-primary" />}
             </div>
+
             {isUploading ? (
               <p className="text-sm text-muted-foreground">Uploading...</p>
             ) : isDragActive ? (
-              <p className="text-sm text-muted-foreground">Drop images here</p>
+              <p className="text-sm text-muted-foreground">Drop media here</p>
             ) : (
               <>
-                <p className="text-sm font-medium">Add more images</p>
-                <p className="text-xs text-muted-foreground">
-                  JPG, PNG, or WebP • Max 5MB each
-                </p>
+                <p className="text-sm font-medium">Add image or video</p>
+                <p className="text-xs text-muted-foreground">JPG, PNG, WebP, or MP4 (preferably without audio)</p>
               </>
             )}
           </div>

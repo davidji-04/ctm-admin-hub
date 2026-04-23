@@ -36,17 +36,64 @@ interface WizardData {
     } | null;
   };
   step4?: {
-    descricao: string;
-    historia_percurso?: string;
-    destaques_unicos?: string;
-    experiencia_cultural?: string;
-    desafios_esperados?: string;
-    certificacoes?: string;
-    relatos_equipe?: string;
-  };
-  step5?: {
-    heroImage: { id: string; url: string } | null;
-    gallery: Array<{ id: string; url: string }>;
+    mediaPrincipalUrl?: string;
+    publicTitle: string;
+    publicLead: string;
+    introSectionTitle: string;
+    introDescription: string;
+    visualHighlightImageUrl?: string;
+    impactText?: string;
+    quickHighlights: Array<{
+      icon: 'compass' | 'moose' | 'mountain' | 'map-pin' | 'alert' | 'info';
+      label: string;
+      value: string;
+    }>;
+    nationalMapImageUrl?: string;
+    technicalDistanceKm?: number;
+    technicalAltimetryM?: number;
+    technicalDuration?: string;
+    technicalDifficulty?: 'facil' | 'moderado' | 'dificil';
+    routeGpxUrl?: string;
+    itinerary: Array<{
+      dayTitle: string;
+      startPoint: string;
+      endPoint: string;
+      stageDistanceKm?: number;
+      stageNotes?: string;
+    }>;
+    recommendedSeason?: string;
+    accommodationAndSupply?: string;
+    arrivalLogistics?: string;
+    curiosities: Array<{
+      imageUrl?: string;
+      title: string;
+      text: string;
+    }>;
+    etiquetteRules: Array<{
+      icon: 'compass' | 'moose' | 'mountain' | 'map-pin' | 'alert' | 'info';
+      title: string;
+      description: string;
+    }>;
+    seasonalAlertEnabled: boolean;
+    seasonalAlertTitle?: string;
+    seasonalAlertMessage?: string;
+    lifestyleGalleryUrls: string[];
+    prepManualPdfUrl?: string;
+    equipmentChecklistPdfUrl?: string;
+    essentialEquipment: string[];
+    calendarPrices: Array<{
+      startDate: string;
+      endDate: string;
+      status: 'disponivel' | 'ultimas-vagas' | 'esgotado';
+      pricePerPerson: number;
+      includes?: string;
+    }>;
+    extras: Array<{
+      thumbnailUrl?: string;
+      name: string;
+      additionalPrice: number;
+    }>;
+    leadEmail: string;
   };
 }
 
