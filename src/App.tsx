@@ -28,6 +28,8 @@ import MainLayout from "./components/layout/MainLayout";
 import { TrainingManager } from "./pages/training/TrainingManager";
 import AdminProfile from "./pages/AdminProfile";
 import AnalyticsDashboard from "./pages/reports/AnalyticsDashboard";
+import CreateEditArticle from "./components/blog/CreateEditArticle";
+import BlogManager from "./components/blog/BlogManager";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +65,9 @@ const App = () => (
             <Route path="/images" element={<ImageGallery />} />
             <Route path="/profile" element={<AdminProfile />} />
             <Route path="/reports" element={<AnalyticsDashboard />} />
+            <Route path="/blog" element={<BlogManager />} />
+            <Route path="/blog/admin/criar" element={<CreateEditArticle />} />
+            <Route path="/blog/admin/editar/:id" element={<CreateEditArticle />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

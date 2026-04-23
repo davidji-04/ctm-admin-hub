@@ -13,7 +13,8 @@ import {
   Star,
   Image,
   FileText,
-  Leaf
+  Leaf,
+  BookOpen
 } from "lucide-react";
 
 const navigationItems = [
@@ -29,6 +30,8 @@ const navigationItems = [
   { name: "Avaliações", href: "/reviews", icon: Star },
   { name: "Imagens", href: "/images", icon: Image },
   { name: "Relatórios", href: "/reports", icon: FileText },
+  { name: "Blog", href: "/blog", icon: BookOpen },
+
 ];
 
 const Sidebar = () => {  
