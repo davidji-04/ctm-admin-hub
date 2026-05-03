@@ -30,6 +30,9 @@ import AdminProfile from "./pages/AdminProfile";
 import AnalyticsDashboard from "./pages/reports/AnalyticsDashboard";
 import CreateEditArticle from "./components/blog/CreateEditArticle";
 import BlogManager from "./components/blog/BlogManager";
+import ModularPagesManager from "./pages/modular-pages/ModularPagesManager";
+import ModularPageEditor from "./pages/modular-pages/ModularPageEditor";
+import ModularPageView from "./pages/ModularPageView";
 
 const queryClient = new QueryClient();
 
@@ -68,7 +71,11 @@ const App = () => (
             <Route path="/blog" element={<BlogManager />} />
             <Route path="/blog/admin/criar" element={<CreateEditArticle />} />
             <Route path="/blog/admin/editar/:id" element={<CreateEditArticle />} />
+            <Route path="/modular-pages" element={<ModularPagesManager />} />
+            <Route path="/modular-pages/new" element={<ModularPageEditor />} />
+            <Route path="/modular-pages/:pageId/edit" element={<ModularPageEditor />} />
           </Route>
+          <Route path="/pages/:slug" element={<ModularPageView />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         </BrowserRouter>

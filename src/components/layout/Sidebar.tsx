@@ -14,7 +14,8 @@ import {
   Image,
   FileText,
   Leaf,
-  BookOpen
+  BookOpen,
+  Layers
 } from "lucide-react";
 
 const navigationItems = [
@@ -31,6 +32,7 @@ const navigationItems = [
   { name: "Imagens", href: "/images", icon: Image },
   { name: "Relatórios", href: "/reports", icon: FileText },
   { name: "Blog", href: "/blog", icon: BookOpen },
+  { name: "Páginas Modulares", href: "/modular-pages", icon: Layers },
 
 ];
 
