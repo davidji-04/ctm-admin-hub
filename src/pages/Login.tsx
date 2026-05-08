@@ -1,3 +1,4 @@
+/** 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -125,6 +126,106 @@ const Login = () => {
             <Button 
               type="submit" 
               className="w-full" 
+              disabled={isLoading}
+            >
+              {isLoading ? "A entrar..." : "Entrar"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default Login;
+
+*/
+
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { Leaf } from "lucide-react";
+// Podes manter o import do authService, mesmo sem o usar para já
+import { authService } from "@/components/services/authService";
+
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    // BYPASS TEMPORÁRIO PARA DEMONSTRAÇÃO NO DEPLOY:
+    // Agora vai forçar a entrada sempre, independentemente de ser DEV ou PRODUÇÃO.
+    const devUser = {
+      email: email || "admin@ctm.com",
+      role: "admin",
+      name: "Administrador",
+      id: "demo-user"
+    };
+
+    localStorage.setItem("token", "demo-token");
+    localStorage.setItem("ctm_user", JSON.stringify(devUser));
+
+    toast({
+      title: "Modo de Demonstração",
+      description: `Acesso concedido para exploração do backoffice.`,
+    });
+
+    navigate("/dashboard");
+    setIsLoading(false);
+
+    // Todo o código original que ligava ao backend foi temporariamente 
+    // ignorado graças ao "return" em cima (ou podes apagá-lo/comentá-lo se preferires).
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="space-y-3 text-center">
+          <div className="mx-auto w-16 h-16 rounded-full bg-primary flex items-center justify-center">
+            <Leaf className="w-8 h-8 text-primary-foreground" />
+          </div>
+          <CardTitle className="text-2xl font-bold">Painel de Administração CTM</CardTitle>
+          <CardDescription>
+            Cheiro de Terra Molhada - Sistema Administrativo
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="admin@ctm.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Palavra-passe</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full"
               disabled={isLoading}
             >
               {isLoading ? "A entrar..." : "Entrar"}
