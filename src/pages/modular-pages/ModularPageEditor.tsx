@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ModularPage } from '@/types/modular-page';
 import { mockModularPages } from '@/data/mockModularPages';
@@ -6,36 +6,45 @@ import ModularPageManager from '@/components/modular-pages/ModularPageManager';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 
+const createEmptyPage = (): ModularPage => ({
+  id: `page-${Date.now()}`,
+  slug: '',
+  pageTitle: '',
+  status: 'draft' as const,
+  cardListing: {
+    title: '',
+    image: { url: '', alt: '' },
+    shortDescription: '',
+  },
+  seo: {
+    title: '',
+    metaDescription: '',
+  },
+  blocks: [],
+  relatedRouteIds: [],
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+});
+
+const getInitialPage = (currentPageId?: string): ModularPage => {
+  if (currentPageId === 'new') {
+    return createEmptyPage();
+  }
+
+  const existingPage = mockModularPages.find((p) => p.id === currentPageId);
+  return existingPage ? { ...existingPage } : createEmptyPage();
+};
+
 export default function ModularPageEditor() {
   const { pageId } = useParams<{ pageId: string }>();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Get page from mock data or create new
-  let initialPage: ModularPage = mockModularPages.find((p) => p.id === pageId) ||
-    pageId === 'new'
-    ? {
-        id: `page-${Date.now()}`,
-        slug: '',
-        pageTitle: '',
-        status: 'draft' as const,
-        cardListing: {
-          title: '',
-          image: { url: '', alt: '' },
-          shortDescription: '',
-        },
-        seo: {
-          title: '',
-          metaDescription: '',
-        },
-        blocks: [],
-        relatedRouteIds: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-    : mockModularPages[0];
+  const [page, setPage] = useState<ModularPage>(() => getInitialPage(pageId));
 
-  const [page, setPage] = useState<ModularPage>(initialPage);
+  useEffect(() => {
+    setPage(getInitialPage(pageId));
+  }, [pageId]);
 
   const handleSave = (updatedPage: ModularPage) => {
     setIsLoading(true);
